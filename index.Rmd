@@ -1,11 +1,10 @@
 ---
 title: "Calming/relaxing aspects of music, both for humans and dogs (?)"
 author: "Jan Hengeveld"
-date: "2023-02-27"
+date: "2023-02-28"
 output:
   flexdashboard::flex_dashboard:
     storyboard: true
-    self_contained: false
 ---
 
 ```{r, setup}
@@ -17,7 +16,7 @@ library(compmus)
 
 ### Computational-Musicology
 
-This website describes a project in my third year of doing a Bachelors study Musicology at the University of Amsterdam (with a specialization in Music Cognition).
+This website describes my project in the third year of doing a Bachelors study Musicology at the University of Amsterdam (with a specialization in Music Cognition).
 
 My project has initially aimed to search for music playlists on Spotify with keywords 'relax', 'relaxation' or 'calming'. Not only for humans but also specifically for dogs. There is a large quantity of music (artists, albums, playlists) available on Spotify with those keywords, also for dogs (and cats, jointly our most favorite pets to live with us, human beings).
 
@@ -25,10 +24,9 @@ I attempt (present tense at this stage...) to -first broadly- search, then self-
 
 The interest stems from my scientific curiosity into the emotional and behavioral effects of sounds (specifically **musical** sounds in this project) for humans and animals (dogs here!) alike. Not least because of my love for my own pet dog, Tess, a 3-year-old Toller Retriever. Her well-being means the world to me and if we can understand the potential calming effects of sounds to dogs a bit better I hope this can assist in furthering the broad animal's well-being policies and guidelines.
 
-***
+------------------------------------------------------------------------
 
-![](images/IMG-6162.jpg){width="60%"}
-
+![](images/IMG-6162.jpg){width="11.2cm"}
 
 ### Introduction to analysis of music, aimed at 'relax(ation)' / 'calming'
 
