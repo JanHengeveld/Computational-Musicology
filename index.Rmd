@@ -18,7 +18,7 @@ library(compmus)
 
 ### Computational-Musicology
 
-This website describes my project in the third year of doing a Bachelors study Musicology at the University of Amsterdam (with a specialization in Music Cognition).
+This blaswebsite describes my project in the third year of doing a Bachelors study Musicology at the University of Amsterdam (with a specialization in Music Cognition).
 
 My project has initially aimed to search for music playlists on Spotify with keywords 'relax', 'relaxation' or 'calming'. Not only for humans but also specifically for dogs. There is a large quantity of music (artists, albums, playlists) available on Spotify with those keywords, also for dogs (and cats, jointly our most favorite pets to live with us, human beings).
 
@@ -60,6 +60,8 @@ Research has been done into calming/relaxing effects of music, both for humans a
 #### [Spotify playlist humans]
 
 <https://open.spotify.com/playlist/3B0FtfxNiFOo82o8lmJcIp?si=d6447cd190234b6a>
+
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3B0FtfxNiFOo82o8lmJcIp?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 
 #### [Spotify playlist dogs]
 
