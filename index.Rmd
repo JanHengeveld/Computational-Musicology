@@ -1,5 +1,5 @@
 ---
-title: "Calming/relaxing aspects of music, both for humans and dogs (?)"
+title: "Calming/relaxing aspects of music for humans (and dogs?)"
 author: "Jan Hengeveld"
 date: "2023-02-28"
 output:
@@ -8,6 +8,7 @@ output:
 ---
 
 ```{r, setup}
+
 library(tidyverse)
 library(plotly)
 library(spotifyr)
