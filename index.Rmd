@@ -1,5 +1,5 @@
 ---
-title: "Calming/relaxing aspects of music for humans (and dogs?)"
+title: "Calming/relaxing aspects of music for humans and dogs"
 author: "Jan Hengeveld"
 date: "2023-02-28"
 output:
@@ -15,12 +15,27 @@ library(plotly)
 library(spotifyr)
 library(compmus)
 ```
+```{r, selecting data from spotify and combining for analysis}
+
+dogs <- get_playlist_audio_features("", "5hQo2asoxqQrnJFeufycj1")
+humans <- get_playlist_audio_features("", "3B0FtfxNiFOo82o8lmJcIp")
+dogsscience <- get_playlist_audio_features("", "0km3mDUsP3LYDS1BZfqsY5")
+humansscience <- get_playlist_audio_features("", "1t06IDDtn5eYo4Ow7Fwmcb")
+
+combine4lists <-
+bind_rows(
+humans |> mutate(category = "Humans"),
+dogs |> mutate(category = "Dogs"),
+dogsscience |> mutate(category = "Dogsscience"),
+humansscience |> mutate(category = "Humansscience")
+)
+```
 
 ### Computational-Musicology {data-commentary-width="500"}
 
 This website describes my project for the course Computational Musicology in the third year of doing a Bachelors study Musicology at the University of Amsterdam (with a specialization in Music Cognition). The course deals with the use of computers as a tool for answering musicological questions.
 
-My project has initially aimed to search for music playlists on Spotify with keywords 'relax', 'relaxation' or 'calming'. Not only for humans but also specifically for dogs. There is a large quantity of music (artists, albums, playlists) available on Spotify with those keywords, also for dogs (and cats, jointly our most favorite pets to live with us, human beings).
+My project has initially aimed to search for music playlists on Spotify with keywords 'relax', 'relaxation' or 'calming'. Not only for humans but also -specifically- for dogs. There is a large quantity of music (artists, albums, playlists) available on Spotify with those keywords, also for dogs (and cats, jointly our most favorite pets to live with us, human beings).
 
 I attempt (present tense at this stage...) to -first broadly- search, then self-assemble and -select, compare, and (deeply) analyze music (playlists and individual songs) on Spotify, specifically searching for **similarities** and/or **differences** in 'calming/relaxing music' for humans and for dogs.
 
@@ -30,7 +45,7 @@ The interest stems from my scientific curiosity into the emotional and behaviora
 
 ![](images/IMG-6162.jpg){width="14cm"}
 
-### Introduction to analysis of music, aimed at 'relax(ation)'/'calming' {data-commentary-width="500"}
+### Introduction to analysis of music, made and selected on Spotify for 'relax(ation)'/'calming' {data-commentary-width="500"}
 
 #### For this project I have analysed playlists on Spotify which are named either 'calming' or 'relaxing' or 'relaxation' and qualify & group them (eventually after some further research) fourfold:
 
@@ -65,9 +80,6 @@ Spotify playlist humans:
 
 <https://open.spotify.com/playlist/3B0FtfxNiFOo82o8lmJcIp?si=d6447cd190234b6a>
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3B0FtfxNiFOo82o8lmJcIp?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
-
-</iframe>
 
 {width = "6cm"}
 
@@ -75,9 +87,7 @@ Spotify playlist humans:
 
 <https://open.spotify.com/playlist/5hQo2asoxqQrnJFeufycj1?si=565ef05c6ff24ae0>
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5hQo2asoxqQrnJFeufycj1?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
 
-</iframe>
 
 {width = "6cm"}
 
@@ -85,9 +95,7 @@ Spotify playlist humans:
 
 <https://open.spotify.com/playlist/1t06IDDtn5eYo4Ow7Fwmcb?si=5d4a68e5d2334b34>
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1t06IDDtn5eYo4Ow7Fwmcb?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
 
-</iframe>
 
 {width = "6cm"}
 
@@ -95,15 +103,147 @@ Spotify playlist humans:
 
 <https://open.spotify.com/playlist/0km3mDUsP3LYDS1BZfqsY5?si=2775cd3b8a18422d>
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0km3mDUsP3LYDS1BZfqsY5?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
 
-</iframe>
 
 {width = "6cm"}
 
 ------------------------------------------------------------------------
 
 ### A global analysis of 4 relaxation playlists: humans, dogs, 'sciencehumans' and sciencedogs'
+
+```{r, scatterplots}
+
+dogs |> ggplot(aes(x = tempo, y = energy)) + geom_point() + geom_smooth()
+## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+
+```
+
+```{r, code from ashley}
+dogs |>                    # Start with awards.
+  mutate(
+    mode = ifelse(mode == 0, "Minor", "Major")
+  ) |>
+  ggplot(                     # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = loudness,
+      colour = mode
+    )
+  ) +
+  geom_point() +              # Scatter plot.
+  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  geom_text(                  # Add text labels from above.
+    aes(
+      x = valence,
+      y = energy,
+      label = label
+    ),
+    data = 
+      tibble(
+        label = c("OUtlier", "ENERGY"),
+        category = c("Edisons", "Grammys"),
+        valence = c(0.090, 0.123),
+        energy = c(0.101, 0.967)
+      ),
+    colour = "black",         # Override colour (not mode here).
+    size = 3,                 # Override size (not loudness here).
+    hjust = "left",           # Align left side of label with the point.
+    vjust = "bottom",         # Align bottom of label with the point.
+    nudge_x = -0.05,          # Nudge the label slightly left.
+    nudge_y = 0.02            # Nudge the label slightly up.
+  ) +
+  facet_wrap(~ category) +    # Separate charts per playlist.
+  scale_x_continuous(         # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
+    minor_breaks = NULL       # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(         # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Paired"        # Name of the palette is 'Paired'.
+  ) +
+  scale_size_continuous(      # Fine-tune the sizes of each point.
+    trans = "exp",            # Use an exp transformation to emphasise loud.
+    guide = "none"            # Remove the legend for size.
+  ) +
+  theme_light() +             # Use a simpler theme.
+  labs(                       # Make the titles nice.
+    x = "loudness",
+    y = "Energy",
+    colour = "Mode"
+  )
+
+```
+
+```{r, code from ashley2}
+humans |>                    # Start with awards.
+  mutate(
+    mode = ifelse(mode == 0, "Minor", "Major")
+  ) |>
+  ggplot(                     # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = loudness,
+      colour = mode
+    )
+  ) +
+  geom_point() +              # Scatter plot.
+  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  geom_text(                  # Add text labels from above.
+    aes(
+      x = valence,
+      y = energy,
+      label = label
+    ),
+    data = 
+      tibble(
+        label = c("OUtlier", "ENERGY"),
+        category = c("Edisons", "Grammys"),
+        valence = c(0.090, 0.123),
+        energy = c(0.101, 0.967)
+      ),
+    colour = "black",         # Override colour (not mode here).
+    size = 3,                 # Override size (not loudness here).
+    hjust = "left",           # Align left side of label with the point.
+    vjust = "bottom",         # Align bottom of label with the point.
+    nudge_x = -0.05,          # Nudge the label slightly left.
+    nudge_y = 0.02            # Nudge the label slightly up.
+  ) +
+  facet_wrap(~ category) +    # Separate charts per playlist.
+  scale_x_continuous(         # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
+    minor_breaks = NULL       # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(         # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Paired"        # Name of the palette is 'Paired'.
+  ) +
+  scale_size_continuous(      # Fine-tune the sizes of each point.
+    trans = "exp",            # Use an exp transformation to emphasise loud.
+    guide = "none"            # Remove the legend for size.
+  ) +
+  theme_light() +             # Use a simpler theme.
+  labs(                       # Make the titles nice.
+    x = "loudness",
+    y = "Energy",
+    colour = "Mode"
+  )
+
+```
 
 #### bla bla bla
 
