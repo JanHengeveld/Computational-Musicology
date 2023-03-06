@@ -32,6 +32,177 @@ humansscience |> mutate(category = "Humansscience")
 )
 ```
 
+
+### Homework for Week 9; chromagrams and cepstograms
+
+(this is still very much a work in progress!! I am catching up with certain aspects of R and data analysis; but getting there!; It might be worthwhile to also have a peek at the other tabs at this stage)
+
+
+Following earlier analysis I proceeded with a few selected songs to deeper analyse other aspects as provided by chromagrams and cepstrograms. 
+
+
+```{r, selection of several songs for bla chroma analysis}
+
+chromadog <- get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |>
+  select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+
+chromahuman <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |>
+   select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+
+chromadogoutlierswan <- get_tidy_audio_analysis("0U5ykKn6MpH5maeCCS3CrX") |>
+  select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+
+```
+
+
+I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon the following research:
+
+<https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf>\>. This study concluded upon a top 10 list of most relaxing songs, with Weightless as nr 1.
+
+```{r, chroma bla for humans euclidian}
+chromahuman |>
+  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
+  compmus_gather_chroma() |> 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+
+```
+Weightless is -intendedly- not a very energetic or (pitch/chords/beats/timbre) changing song, quite the opposite. When listening to it, I can hear the change to emphasis on D and A happening after exactly 89 seconds. Some, but very little, melodic aspects then come into play. Reason herefor is, as explained by the reseachers, that when trying to have humans relax to music they want to minimize the brain activity related to predicting where the melody is developing to. 
+
+(more explanation to follow)
+
+*** 
+
+I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong Reggae 'vibe' to it and other research on the effect of music on calming dogs found that Reggae music was preferred by dogs (reference to article: https://www.scottishspca.org/news/reggae-gets-paw-of-approval)
+
+
+```{r, chroma analysis bla for dogs}
+
+chromadog |>
+  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
+  compmus_gather_chroma() |> 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+```
+A relative short song, Totally Beached, where in the chromagram I believe to see a clear reggae-style appearance of offbeat chord elements. The song follows a classic reggae chord development between I and IV (in this case G minor and C minor). What surprises me in the chrogram is a relative small prominence of Eb, the terts in C minor. The last 10 seconds are a fading-out stall of the applied instruments, hanging on to a single C-dominated finale. 
+
+
+
+
+```{r, cepstrograms first attempts}
+
+singlehumanscience <-
+  get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |> # Change URI.
+  compmus_align(bars, segments) |>                     # Change `bars`
+  select(bars) |>                                      #   in all three
+  unnest(bars) |>                                      #   of these lines.
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  )
+```
+
+
+```{r, cepstrogram on weightless}
+singlehumanscience|>
+  compmus_gather_timbre() |>
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+```
+The above cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
+
+
+```{r, cepstrograms first attempts this one for dogs}
+
+singledogsscience <-
+  get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |> # Change URI.
+  compmus_align(bars, segments) |>                     # Change `bars`
+  select(bars) |>                                      #   in all three
+  unnest(bars) |>                                      #   of these lines.
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  )
+```
+
+```{r, cepstrogram on Totally Beached}
+singledogsscience|>
+  compmus_gather_timbre() |>
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+```
+First indications make me think that flatness is indeed high in Totally Beached (the song for dogs based on science). Also a relative high level of c04 which could relate to the relative sharp 'attack' style of the strumming guitar with reggae. 
+(more analysis to follow)
+
+
+
+
 ### Computational-Musicology {data-commentary-width="600"}
 
 This website describes my project for the course Computational Musicology in the third year of doing a Bachelors study Musicology at the University of Amsterdam (with a specialization in Music Cognition). The course deals with the use of computers as a tool for answering musicological questions.
@@ -318,16 +489,15 @@ humans |>                    # Start with awards.
 
 ```
 
+
+
+
+
+
+
 ### Further chroma analysis into a few selected songs
 
-#### I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon the following research:
-
-<https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf>\>. This study concluded upon a top 10 list of most relaxing song, with Weightless as nr 1.
-
-#### I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong Reggae 'vibe' to it and other research on the effect of music on calming dogs found that Reggae music was preferred by dogs (reference to article)
-
-
-```{r, chroma analysis for dogs}
+```{r, selection of several songs for chroma analysis}
 
 chromadog <- get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |>
   select(segments) |>
@@ -339,23 +509,20 @@ chromahuman <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |>
   unnest(segments) |>
   select(start, duration, pitches)
 
-chromadog |>
-  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
-  compmus_gather_chroma() |> 
-  ggplot(
-    aes(
-      x = start + duration / 2,
-      width = duration,
-      y = pitch_class,
-      fill = value
-    )
-  ) +
-  geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
-  theme_minimal() +
-  scale_fill_viridis_c()
+chromadogoutlierswan <- get_tidy_audio_analysis("0U5ykKn6MpH5maeCCS3CrX") |>
+  select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+
 ```
-```{r, chroma for humans}
+
+
+
+I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon the following research:
+
+<https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf>\>. This study concluded upon a top 10 list of most relaxing song, with Weightless as nr 1.
+
+```{r, chroma for humans euclidian}
 chromahuman |>
   mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
   compmus_gather_chroma() |> 
@@ -373,6 +540,50 @@ chromahuman |>
   scale_fill_viridis_c()
 
 ```
+
+
+I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong Reggae 'vibe' to it and other research on the effect of music on calming dogs found that Reggae music was preferred by dogs (reference to article)
+
+
+```{r, chroma analysis for dogs}
+
+chromadog |>
+  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
+  compmus_gather_chroma() |> 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+```
+```{r, chroma analysis for dogs outlier swan}
+
+chromadogoutlierswan |>
+  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
+  compmus_gather_chroma() |> 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+```
+
+
+
 
 
 ```{r eval=FALSE, message=FALSE, include=FALSE}
@@ -424,8 +635,31 @@ bind_rows(
   labs(x = "", y = "")
 ```
 
+```{r, example for DTW based upon Ashleys template}
 
-### Homework for Week 9; chromagrams and cepstograms
+compmus_long_distance(
+  chromahuman |> mutate(pitches = map(pitches, compmus_normalise, "chebyshev")),
+  chromadogoutlierswan |> mutate(pitches = map(pitches, compmus_normalise, "chebyshev")),
+  feature = pitches,
+  method = "euclidean"
+) |>
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_equal() +
+  labs(x = "typical human song", y = "outlier dog") +
+  theme_minimal() +
+  scale_fill_viridis_c(guide = NULL)
+```
+
+
 
 
 
