@@ -1,0 +1,249 @@
+---
+title: "first analysis"
+author: "Jan Hengeveld"
+date: "2023-03-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, setup for first analysis}
+
+library(tidyverse)
+library(plotly)
+library(spotifyr)
+library(compmus)
+```
+```{r, selecting data from spotify and combining for analysis}
+
+dogs <- get_playlist_audio_features("", "5hQo2asoxqQrnJFeufycj1")
+humans <- get_playlist_audio_features("", "3B0FtfxNiFOo82o8lmJcIp")
+dogsscience <- get_playlist_audio_features("", "0km3mDUsP3LYDS1BZfqsY5")
+humansscience <- get_playlist_audio_features("", "1t06IDDtn5eYo4Ow7Fwmcb")
+combine4lists <- bind_rows(
+humans |> mutate(category = "Humans"),
+dogs |> mutate(category = "Dogs"),
+dogsscience |> mutate(category = "Dogsscience"),
+humansscience |> mutate(category = "Humansscience")
+)
+``
+
+### A global analysis of 4 relaxation playlists: humans, dogs, 'humansscience' and 'dogsscience'
+
+**I started the analysis with a comparison on single elements between the 4 groups**
+  
+
+(N.B. at the moment this is still a garbage tab which requires clean-up)
+
+<https://open.spotify.com/playlist/48fYbZUMrk5mJwhfj3xAi4?si=e4adb9f034634348>
+
+------------------------------------------------------------------------
+
+```{r, 1 single variable compared}
+combine4lists |>
+  ggplot(aes(x = energy)) +
+  geom_histogram(binwidth = 0.1) +
+  facet_wrap(~category)
+combine4lists |>
+  ggplot(aes(x = category, y = energy)) +
+  geom_boxplot()
+combine4lists |>
+  ggplot(aes(x = category, y = energy)) +
+  geom_violin()
+```
+
+```{r, 1 single variable compared; tempo}
+combine4lists |>
+  ggplot(aes(x = tempo)) +
+  geom_histogram(binwidth = 0.1) +
+  facet_wrap(~category)
+combine4lists |>
+  ggplot(aes(x = category, y = tempo)) +
+  geom_boxplot()
+combine4lists |>
+  ggplot(aes(x = category, y = tempo)) +
+  geom_violin()
+```
+
+```{r, 1 single variable compared; speechiness}
+combine4lists |>
+  ggplot(aes(x = tempo)) +
+  geom_histogram(binwidth = 0.1) +
+  facet_wrap(~category)
+combine4lists |>
+  ggplot(aes(x = category, y = speechiness)) +
+  geom_boxplot()
+combine4lists |>
+  ggplot(aes(x = category, y = speechiness)) +
+  geom_violin()
+```
+
+```{r, 1 single variable compared; valence}
+combine4lists |>
+  ggplot(aes(x = valence)) +
+  geom_histogram(binwidth = 0.1) +
+  facet_wrap(~category)
+combine4lists |>
+  ggplot(aes(x = category, y = valence)) +
+  geom_boxplot()
+combine4lists |>
+  ggplot(aes(x = category, y = valence)) +
+  geom_violin()
+```
+
+```{r, 1 single variable compared; mode}
+combine4lists |>
+  ggplot(aes(x = tempo)) +
+  geom_histogram(binwidth = 0.1) +
+  facet_wrap(~category)
+combine4lists |>
+  ggplot(aes(x = category, y = mode)) +
+  geom_boxplot()
+combine4lists |>
+  ggplot(aes(x = category, y = mode)) +
+  geom_violin()
+```
+
+------------------------------------------------------------------------
+
+```{r, scatterplots}
+
+dogs |> ggplot(aes(x = tempo, y = energy)) + geom_point() + geom_smooth()
+## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
+
+
+```
+
+```{r, code from ashley}
+dogs |>                    # Start with awards.
+  mutate(
+    mode = ifelse(mode == 0, "Minor", "Major")
+  ) |>
+  ggplot(                     # Set up the plot.
+    aes(
+      x = loudness,
+      y = energy,
+      size = valence,
+      colour = mode
+    )
+  ) +
+  geom_point() +              # Scatter plot.
+  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  geom_text(                  # Add text labels from above.
+    aes(
+      x = valence,
+      y = energy,
+      label = label
+    ),
+    data = 
+      tibble(
+        label = c("Outlier", "ENERGY"),
+        category = c("Edisons", "Grammys"),
+        valence = c(0.090, 0.123),
+        energy = c(0.101, 0.967)
+      ),
+    colour = "black",         # Override colour (not mode here).
+    size = 3,                 # Override size (not loudness here).
+    hjust = "left",           # Align left side of label with the point.
+    vjust = "bottom",         # Align bottom of label with the point.
+    nudge_x = -0.05,          # Nudge the label slightly left.
+    nudge_y = 0.02            # Nudge the label slightly up.
+  ) +
+  facet_wrap(~ category) +    # Separate charts per playlist.
+  scale_x_continuous(         # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
+    minor_breaks = NULL       # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(         # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Paired"        # Name of the palette is 'Paired'.
+  ) +
+  scale_size_continuous(      # Fine-tune the sizes of each point.
+    trans = "exp",            # Use an exp transformation to emphasise loud.
+    guide = "none"            # Remove the legend for size.
+  ) +
+  theme_light() +             # Use a simpler theme.
+  labs(                       # Make the titles nice.
+    x = "loudness",
+    y = "Energy",
+    colour = "Mode"
+  )
+
+```
+
+```{r, code from ashley2}
+humans |>                    # Start with awards.
+  mutate(
+    mode = ifelse(mode == 0, "Minor", "Major")
+  ) |>
+  ggplot(                     # Set up the plot.
+    aes(
+      x = valence,
+      y = energy,
+      size = loudness,
+      colour = mode
+    )
+  ) +
+  geom_point() +              # Scatter plot.
+  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
+  geom_text(                  # Add text labels from above.
+    aes(
+      x = valence,
+      y = energy,
+      label = label
+    ),
+    data = 
+      tibble(
+        label = c("OUtlier", "ENERGY"),
+        category = c("Edisons", "Grammys"),
+        valence = c(0.090, 0.123),
+        energy = c(0.101, 0.967)
+      ),
+    colour = "black",         # Override colour (not mode here).
+    size = 3,                 # Override size (not loudness here).
+    hjust = "left",           # Align left side of label with the point.
+    vjust = "bottom",         # Align bottom of label with the point.
+    nudge_x = -0.05,          # Nudge the label slightly left.
+    nudge_y = 0.02            # Nudge the label slightly up.
+  ) +
+  facet_wrap(~ category) +    # Separate charts per playlist.
+  scale_x_continuous(         # Fine-tune the x axis.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
+    minor_breaks = NULL       # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(         # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    minor_breaks = NULL
+  ) +
+  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
+    type = "qual",            # Qualitative set.
+    palette = "Paired"        # Name of the palette is 'Paired'.
+  ) +
+  scale_size_continuous(      # Fine-tune the sizes of each point.
+    trans = "exp",            # Use an exp transformation to emphasise loud.
+    guide = "none"            # Remove the legend for size.
+  ) +
+  theme_light() +             # Use a simpler theme.
+  labs(                       # Make the titles nice.
+    x = "loudness",
+    y = "Energy",
+    colour = "Mode"
+  )
+
+```
+
+
+
+
+
