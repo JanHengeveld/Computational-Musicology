@@ -122,16 +122,6 @@ humansscience |> mutate(category = "Humansscience")
 
 ### Homework for Week 9: chromagrams and cepstograms {data-commentary-width="600"}
 
-**Following earlier analysis I proceeded with a few selected songs to deeper analyse other aspects as provided by chromagrams and cepstrograms**
-
-CHROMAGRAMS
-
-WEIGHTLESS
-
-
-
-
-
 
 ```{r, selection of several songs for bla chroma analysis}
 
@@ -145,9 +135,6 @@ chromahuman <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |>
   unnest(segments) |>
   select(start, duration, pitches)
 ```
-
-
-
 
 
 
@@ -174,6 +161,9 @@ chromahuman |>
 ```
 
 ***
+**Following earlier analysis I proceeded with a few selected songs from the 2 science-based playlists to deeper analyse other aspects as provided by chromagrams**
+
+This tab explains the pitch-classes structure of the song "Weightless", the next tab of the song "Totally Beached"
 
 I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon [this research](https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf). This study concluded upon a top 10 list of most relaxing songs, with Weightless as nr 1.
 
@@ -182,7 +172,7 @@ Weightless is -intendedly- not a very energetic or (pitch/chords/beats/timbre) c
 (more explanation to follow)
 
 
-### Next tab
+### Chromagram on science-based dogs relaxation song
 
 
 
@@ -211,12 +201,10 @@ chromadog |>
 
 ***
 
-I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong Reggae 'vibe' to it and other research on the effect of music on calming dogs found that Reggae music was preferred by dogs (reference to article: https://www.scottishspca.org/news/reggae-gets-paw-of-approval)
+I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong reggae 'vibe' to it and [other research](https://www.scottishspca.org/news/reggae-gets-paw-of-approval) on the effect of music on calming dogs found that reggae music is a genre preferred by dogs.
 
 
-
-
-A relative short song, Totally Beached, where in the chromagram I believe to see a clear reggae-style appearance of offbeat chord elements. The song follows a classic reggae chord development between I and IV (in this case G minor and C minor). What surprises me in the chrogram is a relative small prominence of Eb, the terts in C minor. The last 10 seconds are a fading-out stall of the applied instruments, hanging on to a single C-dominated finale. 
+Totally Beached is a relative short song, where in the chromagram I believe to see a clear reggae-style appearance of offbeat chord elements. The song follows a classic reggae chord development between I and IV (in this case G minor and C minor). What surprises me in the chrogram is a relative small prominence of Eb, the terts in C minor. The last 10 seconds are a fading-out stall of the applied instruments, hanging on to a single C-dominated finale. 
 
 
 ### Cepstrograms
