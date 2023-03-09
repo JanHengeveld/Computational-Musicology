@@ -126,7 +126,12 @@ humansscience |> mutate(category = "Humansscience")
 
 CHROMAGRAMS
 
-**WEIGHTLESS**
+WEIGHTLESS
+
+
+
+
+
 
 ```{r, selection of several songs for bla chroma analysis}
 
@@ -140,6 +145,13 @@ chromahuman <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |>
   unnest(segments) |>
   select(start, duration, pitches)
 ```
+
+
+
+
+
+
+
 
 
 ```{r, chroma bla for humans euclidian}
