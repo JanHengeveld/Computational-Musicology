@@ -167,7 +167,7 @@ chromahuman |>
     )
   ) +
   geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude", title = "Weightless (Marconi Union)") +
   theme_minimal() +
   scale_fill_viridis_c()
 
