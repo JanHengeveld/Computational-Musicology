@@ -184,7 +184,7 @@ Weightless is -intendedly- not a very energetic or (pitch/chords/beats/timbre) c
 
 ### Next tab
 
-**TOTALLY BEACHED**
+
 
 ```{r, chroma analysis bla for dogs}
 
@@ -200,7 +200,7 @@ chromadog |>
     )
   ) +
   geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude", title = "Totally beached (Joshua Leeds)") +
   theme_minimal() +
   scale_fill_viridis_c()
 ```
