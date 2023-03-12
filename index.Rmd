@@ -14,6 +14,7 @@ library(plotly)
 library(spotifyr)
 library(compmus)
 ```
+
 ```{r,}
 circshift <- function(v, n) {
   if (n == 0) v else c(tail(v, n), head(v, -n))
@@ -102,7 +103,6 @@ key_templates <-
   )
 ```
 
-
 ```{r, selecting data from spotify and combining for analysis}
 
 dogs <- get_playlist_audio_features("", "5hQo2asoxqQrnJFeufycj1")
@@ -119,233 +119,24 @@ humansscience |> mutate(category = "Humansscience")
 )
 ```
 
+### Homework for week 10
 
-### Homework for Week 9: chromagrams and cepstograms {data-commentary-width="600"}
-
-
-```{r, selection of several songs for bla chroma analysis}
-
-chromadog <- get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |>
-  select(segments) |>
-  unnest(segments) |>
-  select(start, duration, pitches)
-
-chromahuman <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |>
-   select(segments) |>
-  unnest(segments) |>
-  select(start, duration, pitches)
+```{r, 1 single variable compared, homework week 10}
+combine4lists |>
+  ggplot(aes(x = category, y = key)) +
+  geom_boxplot()
 ```
 
+------------------------------------------------------------------------
 
+A remarkable (in my opinion) similarity on keys between the groups, the mean in 3 out of 4 groups on key 5, which is F. Only "humansscience" has F# as mean. I find it very remarkable that the key of C (nr. 1), one would expect an often used key, is completely missing in these boxplots. Further to be analysed.
 
+Analysis on chordograms to follow under the next tab \*\*\*
 
+### Homework week 10 continued (Chordograms)
 
-
-```{r, chroma bla for humans euclidian}
-chromahuman |>
-  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
-  compmus_gather_chroma() |> 
-  ggplot(
-    aes(
-      x = start + duration / 2,
-      width = duration,
-      y = pitch_class,
-      fill = value
-    )
-  ) +
-  geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude", title = "Weightless (Marconi Union)") +
-  theme_minimal() +
-  scale_fill_viridis_c()
-
-```
-
-***
-**Following earlier analysis I proceeded with a few selected songs from the 2 science-based playlists to deeper analyse other aspects as provided by chromagrams**
-
-This tab explains the pitch-classes structure of the song "Weightless", the next tab of the song "Totally Beached"
-
-I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon [this research](https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf). This study concluded upon a top 10 list of most relaxing songs, with Weightless as nr 1.
-
-Weightless is -intendedly- not a very energetic or (pitch/chords/beats/timbre) changing song, quite the opposite. When listening to it, I can hear the change to emphasis on D and A happening after exactly 89 seconds. Some, but very little, melodic aspects then come into play. Reason for this is, as explained by the researchers, that when trying to have humans relax to music they want to minimize the brain activity related to predicting where the melody is developing to.
-
-(more explanation to follow)
-
-
-### Chromagram on science-based dogs relaxation song
-
-
-
-```{r, chroma analysis bla for dogs}
-
-chromadog |>
-  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
-  compmus_gather_chroma() |> 
-  ggplot(
-    aes(
-      x = start + duration / 2,
-      width = duration,
-      y = pitch_class,
-      fill = value
-    )
-  ) +
-  geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude", title = "Totally beached (Joshua Leeds)") +
-  theme_minimal() +
-  scale_fill_viridis_c()
-```
-
-
-
-
-
-***
-
-I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong reggae 'vibe' to it and [other research](https://www.scottishspca.org/news/reggae-gets-paw-of-approval) on the effect of music on calming dogs found that reggae music is a genre preferred by dogs.
-
-
-Totally Beached is a relative short song, where in the chromagram I believe to see a clear reggae-style appearance of offbeat chord elements. The song follows a classic reggae chord development between I and IV (in this case G minor and C minor). What surprises me in the chrogram is a relative small prominence of Eb, the terts in C minor. The last 10 seconds are a fading-out stall of the applied instruments, hanging on to a single C-dominated finale. 
-
-
-### Cepstrograms
-
-```{r, cepstrograms first attempts}
-
-singlehumanscience <-
-  get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |> # Change URI.
-  compmus_align(bars, segments) |>                     # Change `bars`
-  select(bars) |>                                      #   in all three
-  unnest(bars) |>                                      #   of these lines.
-  mutate(
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "rms", norm = "euclidean"              # Change summary & norm.
-      )
-  ) |>
-  mutate(
-    timbre =
-      map(segments,
-        compmus_summarise, timbre,
-        method = "rms", norm = "euclidean"              # Change summary & norm.
-      )
-  )
-```
-
-
-```{r, cepstrogram on weightless}
-singlehumanscience|>
-  compmus_gather_timbre() |>
-  ggplot(
-    aes(
-      x = start + duration / 2,
-      width = duration,
-      y = basis,
-      fill = value
-    )
-  ) +
-  geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
-  scale_fill_viridis_c() +                              
-  theme_classic()
-```
-
-
-The above cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
-
-
-```{r, cepstrograms first attempts this one for dogs}
-
-singledogsscience <-
-  get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |> # Change URI.
-  compmus_align(bars, segments) |>                     # Change `bars`
-  select(bars) |>                                      #   in all three
-  unnest(bars) |>                                      #   of these lines.
-  mutate(
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "rms", norm = "euclidean"              # Change summary & norm.
-      )
-  ) |>
-  mutate(
-    timbre =
-      map(segments,
-        compmus_summarise, timbre,
-        method = "rms", norm = "euclidean"              # Change summary & norm.
-      )
-  )
-```
-
-```{r, cepstrogram on Totally Beached}
-singledogsscience|>
-  compmus_gather_timbre() |>
-  ggplot(
-    aes(
-      x = start + duration / 2,
-      width = duration,
-      y = basis,
-      fill = value
-    )
-  ) +
-  geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
-  scale_fill_viridis_c() +                              
-  theme_classic()
-```
-
-First indications make me think that flatness is indeed high in Totally Beached (the song for dogs based on science). Also a relative high level of c04 which could relate to the relative sharp 'attack' style of the strumming guitar with reggae. 
-(more analysis to follow)
-------
-
-###Self-Similarity Matrices###
-
-```{r, self sim matrix on human single bla}
-singlehumanscience |>
-  compmus_self_similarity(timbre, "cosine") |> 
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")
-```
-
-
-```{r, self sim matrix on dogs science single}
-singledogsscience |>
-  compmus_self_similarity(timbre, "cosine") |> 
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")
-```
-
-
-```{r for SSM dogsscience, echo=FALSE, message=FALSE}
-library(tidyverse)
-library(spotifyr)
-library(compmus)
-singledogscience <-
-  get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |>
+```{r, echo = FALSE}
+get_tidy_audio_analysis("2dphvmoLEXdk8hOYxmHlI3") |>
   compmus_align(bars, segments) |>
   select(bars) |>
   unnest(bars) |>
@@ -353,43 +144,24 @@ singledogscience <-
     pitches =
       map(segments,
         compmus_summarise, pitches,
-        method = "acentre", norm = "manhattan"
+        method = "mean", norm = "manhattan"
       )
-  ) |>
-  mutate(
-    timbre =
-      map(segments,
-        compmus_summarise, timbre,
-        method = "mean"
-      )
-  )
-bind_rows(
-  singledogsscience |>
-    compmus_self_similarity(pitches, "aitchison") |>
-    mutate(d = d / max(d), type = "Chroma"),
-  singledogscience |>
-    compmus_self_similarity(timbre, "euclidean") |>
-    mutate(d = d / max(d), type = "Timbre")
-) |>
-  mutate() |>
+  ) |> 
+  compmus_match_pitch_template(chord_templates, "euclidean", "manhattan") |>
   ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
   ) +
   geom_tile() +
-  coord_fixed() +
-  facet_wrap(~type) +
   scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")
+  theme_minimal() +
+  labs(x = "Time (s)", y = "")
 ```
 
+------------------------------------------------------------------------
 
+As most songs from all 4 playlists are -intendedly- not very 'exciting' in terms of a lot of musical elements (and their possible changes during a song) like tempo, energy, instrumentalness, etc. I decided to pick an outlier from playlist 3 (humansscience) which scores highest on tempo and relatively high on energy
+
+------------------------------------------------------------------------
 
 ### Computational-Musicology {data-commentary-width="600"}
 
@@ -422,12 +194,11 @@ Research has been done into calming/relaxing effects of music, both for humans a
 
 Group 3 and 4, defined on certain scientific research, may show significant differences with groups 1 and 2 on a variety of musical 'elements'. Also between groups 3 and 4, I wanted to analyze similarities and -especially- search for differences. This was a key research goal for this project.
 
-('Elements" are the ones that Spotify allows for analysis as described [on Spotify](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features>))
-
+('Elements" are aspects of music that Spotify allows for analysis as described [on Spotify](https://developer.spotify.com/documentation/web-api/reference/#/operations/get-audio-features%3E)) e.g. loudness, tempo or mode (major or minor)
 
 It might also be that 'true' calming music for dogs is based on musical elements that disqualify for humans as true music (i.e. pitches in sounds at frequency levels unhearable for humans but hearable for dogs. This is not in scope for this project, one reason being is that Spotify doesn't contain (high-pitched) sounds that are non-perceivable for humans but that dogs CAN hear.
 
-My 3d group is based upon the following research into the most relaxing (i.e. anxiety reducing) songs for humans: [neuroscience on anxiety reduction](https://www.inc.com/melanie-curtin/neuroscience-says-listening-to-this-one-song-reduces-anxiety-by-up-to-65-percent.html>, resulting in a 3d group of 10 songs) with [official playlist](https://open.spotify.com/playlist/71mRGOhRHXZRSbQzouuFw7?si=7879ee525f3d4980). The group I created for this research is an exact copy hereof.
+My 3d group is based upon the following research into the most relaxing (i.e. anxiety reducing) songs for humans: [neuroscience on anxiety reduction](https://www.inc.com/melanie-curtin/neuroscience-says-listening-to-this-one-song-reduces-anxiety-by-up-to-65-percent.html%3E,%20resulting%20in%20a%203d%20group%20of%2010%20songs) with [official playlist](https://open.spotify.com/playlist/71mRGOhRHXZRSbQzouuFw7?si=7879ee525f3d4980). The group I created for this research is an exact copy hereof.
 
 I based my fourth group, called on Spotify "Through a Dogs Ear, science-based supposedly" upon the following paper and the available public playlists in Spotify labeled (published by authors of this research). See ["Through a Dogs Ear"](https://icalmpet.com/wp-content/uploads/BioAcoustic-Research-and-Development-Executive-Summary.pdf)
 
@@ -439,38 +210,25 @@ I based my fourth group, called on Spotify "Through a Dogs Ear, science-based su
 
 ------------------------------------------------------------------------
 
-**The playlists used in Spotify:** 
+**The playlists used in Spotify:**
 
 Spotify playlist humans:
 
 <https://open.spotify.com/playlist/3B0FtfxNiFOo82o8lmJcIp?si=d6447cd190234b6a>
 
-
 Spotify playlist dogs:
 
 <https://open.spotify.com/playlist/5hQo2asoxqQrnJFeufycj1?si=565ef05c6ff24ae0>
-
 
 Spotify playlist humans scientific:
 
 <https://open.spotify.com/playlist/1t06IDDtn5eYo4Ow7Fwmcb?si=5d4a68e5d2334b34>
 
-
-Spotify playlist dogs scientific [here] (https://open.spotify.com/playlist/0km3mDUsP3LYDS1BZfqsY5?si=2775cd3b8a18422d)
-
+Spotify playlist dogs scientific: [here](https://open.spotify.com/playlist/0km3mDUsP3LYDS1BZfqsY5?si=2775cd3b8a18422d)
 
 ------------------------------------------------------------------------
 
-### A global analysis of 4 relaxation playlists: humans, dogs, 'humansscience' and 'dogsscience'
-
----
-I started the analysis with a comparison on single elements between the 4 groups
----
-
-(N.B. at the moment this is still a garbage tab which requires clean-up)
-
-
-------------------------------------------------------------------------
+### A global analysis of 4 relaxation playlists: humans, dogs, 'humansscience' and 'dogsscience'. Garbage and single variable oriented!!
 
 ```{r, 1 single variable compared}
 combine4lists |>
@@ -500,7 +258,7 @@ combine4lists |>
 
 ```{r, 1 single variable compared; speechiness}
 combine4lists |>
-  ggplot(aes(x = tempo)) +
+  ggplot(aes(x = speechiness)) +
   geom_histogram(binwidth = 0.1) +
   facet_wrap(~category)
 combine4lists |>
@@ -673,11 +431,70 @@ humans |>                    # Start with awards.
 
 ```
 
+------------------------------------------------------------------------
 
+(N.B. at the moment this is still a garbage tab which requires clean-up)
 
+I started the analysis with a comparison on single elements between the 4 groups
 
+### Global analysis of 4 variables (combined!) over the 4 playlists
 
+```{r, 4 categories compared}
 
+combine4lists <-
+  humans |>
+  mutate(playlist_name = "Relaxation music humans") |>
+  bind_rows(dogs |> mutate(playlist_name = "Relaxation music dogs")) |>
+  bind_rows(humansscience |> mutate(playlist_name = "Relaxation humans, science-based")) |>
+  bind_rows(dogsscience |> mutate(playlist_name = "Relaxation dogs, science-based")) |>
+  mutate(
+    playlist_name = fct_relevel(playlist_name, "Relaxation music humans", "Relaxation music dogs", "Relaxation humans, science-based", "Relaxation dogs, science-based")
+  )
+
+ setup  <-
+  combine4lists |>
+  ggplot(                          # Set up the plot.
+    aes(
+      x = tempo,
+      y = energy,
+      size = danceability,
+      colour = loudness,
+      label = track.name           # Labels will be interactively visible.
+    )
+  ) +
+  geom_point() +                   # Scatter plot.
+  geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
+  facet_wrap(~playlist_name) +           # Separate charts per country.
+  scale_x_continuous(              # Fine-tune the x axis.
+    limits = c(0, 200),
+    breaks = c(0, 100, 200),        # Use grid-lines for quadrants only.
+                # Remove 'minor' grid-lines.
+  ) +
+  scale_y_continuous(              # Fine-tune the y axis in the same way.
+    limits = c(0, 1),
+    breaks = c(0, 0.50, 1),
+    
+  ) +
+  scale_colour_viridis_c(          # Use the cividis palette
+    option = "E",                  # Qualitative set.
+    alpha = 0.8,                   # Include some transparency
+    guide = "none"
+  ) +
+  scale_size_continuous(           # Fine-tune the sizes of each point.
+    guide = "none"                 # Remove the legend for size.
+  ) +
+  theme_light() +                  # Use a simpler theme.
+  labs(                            # Make the titles nice.
+    x = "Tempo",
+    y = "Energy"
+  )
+
+ggplotly(setup)
+```
+
+------------------------------------------------------------------------
+
+Comparing the 4 playlist on variables tempo (x) , energy (y), loudness (color) and instrumentalness (size) as can be seen in the chart left, brings up some interesting and unexpected differences. As mentioned earlier, I expected a lot of similarity on tempo and energy and loudness.
 
 ### Further chroma analysis into a few selected songs
 
@@ -699,8 +516,6 @@ chromadogoutlierswan <- get_tidy_audio_analysis("0U5ykKn6MpH5maeCCS3CrX") |>
   select(start, duration, pitches)
 
 ```
-
-
 
 I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon the following research:
 
@@ -725,9 +540,7 @@ chromahuman |>
 
 ```
 
-
 I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong Reggae 'vibe' to it and other research on the effect of music on calming dogs found that Reggae music was preferred by dogs (reference to article)
-
 
 ```{r, chroma analysis for dogs}
 
@@ -747,6 +560,7 @@ chromadog |>
   theme_minimal() +
   scale_fill_viridis_c()
 ```
+
 ```{r, chroma analysis for dogs outlier swan}
 
 chromadogoutlierswan |>
@@ -765,10 +579,6 @@ chromadogoutlierswan |>
   theme_minimal() +
   scale_fill_viridis_c()
 ```
-
-
-
-
 
 ```{r eval=FALSE, message=FALSE, include=FALSE}
 library(tidyverse)
@@ -843,9 +653,253 @@ compmus_long_distance(
   scale_fill_viridis_c(guide = NULL)
 ```
 
+### Homework for Week 9: chromagrams and cepstograms {data-commentary-width="400"}
 
+```{r, selection of several songs for bla chroma analysis}
 
+chromadog <- get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |>
+  select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
 
+chromahuman <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |>
+   select(segments) |>
+  unnest(segments) |>
+  select(start, duration, pitches)
+```
 
+```{r, chroma bla for humans and dogs libeuclidian}
+chromahuman |>
+  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
+  compmus_gather_chroma() |> 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude", title = "Weightless (Marconi Union)") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+
+chromadog |>
+  mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
+  compmus_gather_chroma() |> 
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = pitch_class,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude", title = "Totally beached (Joshua Leeds)") +
+  theme_minimal() +
+  scale_fill_viridis_c()
+
+```
+
+------------------------------------------------------------------------
+
+**Following earlier analysis I proceeded with a few selected songs from the 2 science-based playlists to deeper analyse other aspects as provided by chromagrams**
+
+This tab explains the pitch-classes structure of the song "Weightless", the next tab of the song "Totally Beached"
+
+I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon [this research](https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf) into relaxing capabilities of music to lower axciety in humans (e.g. pre-surgery). This study concluded upon a top 10 list of most relaxing songs, with Weightless as nr 1.
+
+Weightless is -intendedly- not a very energetic or (pitch/chords/beats/timbre) changing song, quite the opposite. When listening to it, I can hear the change to emphasis on D and A happening after exactly 89 seconds. Some, but very little, melodic aspects then come into play. Reason for this is, as explained by the researchers in their study, that -when trying to have humans relax to music- they want to minimize the brain activity related to predicting where the melody is developing to.
+
+(more explanation to follow)
+
+I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong reggae 'vibe' to it and [certain research](https://www.scottishspca.org/news/reggae-gets-paw-of-approval) on the effect of music on calming dogs found that reggae music (together with soft rocks) is a genre preferred by dogs.
+
+Totally Beached is a relative short song, where in the chromagram I believe to see a clear reggae-style appearance of offbeat chord elements. The song follows a classic reggae chord development between I and IV (in this case G minor and C minor). What surprises me in the chrogram is a relative small prominence of Eb, the terts in C minor. The last 10 seconds are a fading-out stall of the applied instruments, hanging on to a single C-dominated finale.
+
+### Chromagram on science-based dogs relaxation song
+
+### Cepstrograms
+
+```{r, cepstrograms first attempts}
+
+singlehumanscience <-
+  get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |> # Change URI.
+  compmus_align(bars, segments) |>                     # Change `bars`
+  select(bars) |>                                      #   in all three
+  unnest(bars) |>                                      #   of these lines.
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  )
+```
+
+```{r, cepstrogram on weightless}
+singlehumanscience|>
+  compmus_gather_timbre() |>
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+```
+
+The above cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
+
+```{r, cepstrograms first attempts this one for dogs}
+
+singledogsscience <-
+  get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |> # Change URI.
+  compmus_align(bars, segments) |>                     # Change `bars`
+  select(bars) |>                                      #   in all three
+  unnest(bars) |>                                      #   of these lines.
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "rms", norm = "euclidean"              # Change summary & norm.
+      )
+  )
+```
+
+```{r, cepstrogram on Totally Beached}
+singledogsscience|>
+  compmus_gather_timbre() |>
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+```
+
+First indications make me think that flatness is indeed high in Totally Beached (the song for dogs based on science). Also a relative high level of c04 which could relate to the relative sharp 'attack' style of the strumming guitar with reggae. (more analysis to follow) ------
+
+###Self-Similarity Matrices###
+
+```{r, self sim matrix on human single bla}
+singlehumanscience |>
+  compmus_self_similarity(timbre, "cosine") |> 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "")
+```
+
+```{r, self sim matrix on dogs science single}
+singledogsscience |>
+  compmus_self_similarity(timbre, "cosine") |> 
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "")
+```
+
+```{r for SSM dogsscience, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(spotifyr)
+library(compmus)
+singledogscience <-
+  get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |>
+  compmus_align(bars, segments) |>
+  select(bars) |>
+  unnest(bars) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "acentre", norm = "manhattan"
+      )
+  ) |>
+  mutate(
+    timbre =
+      map(segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  )
+bind_rows(
+  singledogsscience |>
+    compmus_self_similarity(pitches, "aitchison") |>
+    mutate(d = d / max(d), type = "Chroma"),
+  singledogscience |>
+    compmus_self_similarity(timbre, "euclidean") |>
+    mutate(d = d / max(d), type = "Timbre")
+) |>
+  mutate() |>
+  ggplot(
+    aes(
+      x = xstart + xduration / 2,
+      width = xduration,
+      y = ystart + yduration / 2,
+      height = yduration,
+      fill = d
+    )
+  ) +
+  geom_tile() +
+  coord_fixed() +
+  facet_wrap(~type) +
+  scale_fill_viridis_c(guide = "none") +
+  theme_classic() +
+  labs(x = "", y = "")
+```
 
 ### Concluding remarks
+
+DRAFT, bulletpoint like remarks:
+
+-   dogs playlist more strictly based on criteria for 'true' relaxation (e.g. tempo around 60-80; low energy); the definition for humans relaxation seems, even for the science-based list, more loosely formulated
+
+-   the bioacoustic aspects that research into calming effects of sounds to dogs have not been analysed. Spotify doesn't provide Nor does Spotify generate music above (but IN for dogs) the hearing frequency spectrum for humans
