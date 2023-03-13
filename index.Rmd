@@ -131,7 +131,10 @@ combine4lists |>
 
 A remarkable (in my opinion) similarity on keys between the groups, the mean in 3 out of 4 groups on key 5, which is F. Only "humansscience" has F# as mean. I find it very remarkable that the key of C (nr. 1), one would expect an often used key, is completely missing in these boxplots. Further to be analysed.
 
-Analysis on chordograms to follow under the next tab \*\*\*
+Analysis on chordograms to follow under the next tab
+
+***
+
 
 ### Homework week 10 continued (Chordograms) {data-commentary-width="500"}
 
@@ -196,6 +199,10 @@ strawberryswing |>
   theme_minimal() +
   labs(x = "Time (s)", y = "")
 ```
+
+
+
+
 ***
 
 As expected, an emphasis on I, IV and V prominence for a song in Ab. Interesting:a lot of dark blue in C# (enharmonically the same as Db). With knowledge of Western chords and their relationships (tonica, subdominant, dominant and others) I expected that the software would 'know' - in the context of this piece of music; circle of fifths!- that Db strongly 'belongs' to Ab and C# not really.
@@ -204,6 +211,7 @@ As expected, an emphasis on I, IV and V prominence for a song in Ab. Interesting
 
 
 ### Homework week 10 continued (part 3): timbre comparison between 2 playlists (humans science and dogs science) {data-commentary-width="500"}
+
 
 ```{r, week 10}
 
@@ -243,11 +251,13 @@ combine2lists |>
   scale_fill_viridis_d() +
   labs(x = "Spotify Timbre Coefficients", y = "", fill = "Genre")
 ```
+
 ***
 
 At first sight, no c02 or c03 scores for the humans science groups, that's...remarkable. What is a handicap of this comparison is that the playlist human science only contains 10 songs. But still, the absence of c02 and c03 is remarkable. In the next tab I will analyse two larger groups, dogs and dogs science. 
 
 ***
+
 
 ### Homework week 10 continued (part 4): timbre comparison between 2 playlists (dogs and dogs science) {data-commentary-width="500"}
 
@@ -325,6 +335,8 @@ combine3lists |>
     alpha = "Volume (dBFS)"
   )
 ```
+
+
 
 ***
 
