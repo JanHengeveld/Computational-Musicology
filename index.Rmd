@@ -133,10 +133,11 @@ A remarkable (in my opinion) similarity on keys between the groups, the mean in 
 
 Analysis on chordograms to follow under the next tab \*\*\*
 
-### Homework week 10 continued (Chordograms)
+### Homework week 10 continued (Chordograms) {data-commentary-width="500"}
 
 ```{r, echo = FALSE}
-get_tidy_audio_analysis("2dphvmoLEXdk8hOYxmHlI3") |>
+strawberryswing <- get_tidy_audio_analysis("2dphvmoLEXdk8hOYxmHlI3") 
+strawberryswing|>
   compmus_align(bars, segments) |>
   select(bars) |>
   unnest(bars) |>
@@ -159,9 +160,178 @@ get_tidy_audio_analysis("2dphvmoLEXdk8hOYxmHlI3") |>
 
 ------------------------------------------------------------------------
 
-As most songs from all 4 playlists are -intendedly- not very 'exciting' in terms of a lot of musical elements (and their possible changes during a song) like tempo, energy, instrumentalness, etc. I decided to pick an outlier from playlist 3 (humansscience) which scores highest on tempo and relatively high on energy
+As most songs from all 4 playlists are -intendedly- not very 'exciting' in terms of a lot of musical elements (and their possible changes during a song) like tempo, energy, instrumentalness, etc. I decided to pick an outlier from playlist 3 (humansscience) which scores highest on tempo and relatively high on energy: Strawberry Swing by Coldplay, to see what happens chords-wise. A chordagram is presented here.
+
+The song is in Ab (as tonica I) with mostly changes to IV (Db) and V (Eb). This is a rather 'normal' chords progression. The black spot around 95 seconds in Db appears to me the emphasis/power on Db (as 'tension' dominant to Ab) just before 'releasing' to tonica Ab ('home'/stability). The same 'returned home' energy on Ab can been seen in the last 80 seconds of the song. As G# enharmonically is the same as Ab, it is no surprise that there's relative a lot of energy in there too. There's also a prominance to be seen in seventh chords, a usual patterns in chordagrams as explained by our lector: 'leakage' of energy in the 7th 'bin' (close to the 1st tonica) plays a role here sometimes).
 
 ------------------------------------------------------------------------
+
+### Homework week 10 continued (part 3): chordogram on keys {data-commentary-width="500"}
+
+```{r, strawberryswing continued} 
+strawberryswing <- get_tidy_audio_analysis("2dphvmoLEXdk8hOYxmHlI3") |>
+  compmus_align(sections, segments) |>
+  select(sections) |>
+  unnest(sections) |>
+  mutate(
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      )
+  )
+```
+```{r, strawberry swing pitch outcomes}
+strawberryswing |> 
+  compmus_match_pitch_template(
+    key_templates,         # Change to chord_templates if descired
+    method = "euclidean",  # Try different distance metrics
+    norm = "manhattan"     # Try different norms
+  ) |>
+  ggplot(
+    aes(x = start + duration / 2, width = duration, y = name, fill = d)
+  ) +
+  geom_tile() +
+  scale_fill_viridis_c(guide = "none") +
+  theme_minimal() +
+  labs(x = "Time (s)", y = "")
+```
+***
+
+As expected, an emphasis on I, IV and V prominence for a song in Ab. Interesting:a lot of dark blue in C# (enharmonically the same as Db). With knowledge of Western chords and their relationships (tonica, subdominant, dominant and others) I expected that the software would 'know' - in the context of this piece of music; circle of fifths!- that Db strongly 'belongs' to Ab and C# not really.
+
+***
+
+
+### Homework week 10 continued (part 3): timbre comparison between 2 playlists (humans science and dogs science) {data-commentary-width="500"}
+
+```{r, week 10}
+
+humansscience <-
+  get_playlist_audio_features(
+    "thesoundsofspotify",
+    "1t06IDDtn5eYo4Ow7Fwmcb"
+  ) |>
+  slice(1:30) |>
+  add_audio_analysis()
+dogsscience <-
+  get_playlist_audio_features(
+    "thesoundsofspotify",
+    "0km3mDUsP3LYDS1BZfqsY5"
+  ) |>
+  slice(1:30) |>
+  add_audio_analysis()
+combine2lists <-
+  humansscience |>
+  mutate(genre = "Humans science") |>
+  bind_rows(dogsscience |> mutate(genre = "Dogs Science"))
+
+combine2lists |>
+  mutate(
+    timbre =
+      map(
+        segments,
+        compmus_summarise,
+        timbre,
+        method = "mean"
+      )
+  ) |>
+  select(genre, timbre) |>
+  compmus_gather_timbre() |>
+  ggplot(aes(x = basis, y = value, fill = genre)) +
+  geom_violin() +
+  scale_fill_viridis_d() +
+  labs(x = "Spotify Timbre Coefficients", y = "", fill = "Genre")
+```
+***
+
+At first sight, no c02 or c03 scores for the humans science groups, that's...remarkable. What is a handicap of this comparison is that the playlist human science only contains 10 songs. But still, the absence of c02 and c03 is remarkable. In the next tab I will analyse two larger groups, dogs and dogs science. 
+
+***
+
+### Homework week 10 continued (part 4): timbre comparison between 2 playlists (dogs and dogs science) {data-commentary-width="500"}
+
+
+```{r, week 10 extra}
+
+dogs <-
+  get_playlist_audio_features(
+    "thesoundsofspotify",
+    "5hQo2asoxqQrnJFeufycj1"
+  ) |>
+  slice(1:30) |>
+  add_audio_analysis()
+dogsscience <-
+  get_playlist_audio_features(
+    "thesoundsofspotify",
+    "0km3mDUsP3LYDS1BZfqsY5"
+  ) |>
+  slice(1:30) |>
+  add_audio_analysis()
+combine3lists <-
+  dogs |>
+  mutate(genre = "Dogs") |>
+  bind_rows(dogsscience |> mutate(genre = "Dogs Science"))
+
+combine3lists |>
+  mutate(
+    timbre =
+      map(
+        segments,
+        compmus_summarise,
+        timbre,
+        method = "mean"
+      )
+  ) |>
+  select(genre, timbre) |>
+  compmus_gather_timbre() |>
+  ggplot(aes(x = basis, y = value, fill = genre)) +
+  geom_violin() +
+  scale_fill_viridis_d() +
+  labs(x = "Spotify Timbre Coefficients", y = "", fill = "Genre")
+```
+
+### Homework week 10 continued (part 4): loudness comparison between 2 playlists (dogs and dogs science) {data-commentary-width="500"}
+
+```{r, week 10 extra bla} 
+combine3lists |>
+  mutate(
+    sections =
+      map(
+        sections,                                    # sections or segments
+        summarise_at,
+        vars(tempo, loudness, duration),             # features of interest
+        list(section_mean = mean, section_sd = sd)   # aggregation functions
+      )
+  ) |>
+  unnest(sections) |>
+  ggplot(
+    aes(
+      x = tempo,
+      y = tempo_section_sd,
+      colour = genre,
+      alpha = loudness
+    )
+  ) +
+  geom_point(aes(size = duration / 60)) +
+  geom_rug() +
+  theme_minimal() +
+  ylim(0, 5) +
+  labs(
+    x = "Mean Tempo (bpm)",
+    y = "SD Tempo",
+    colour = "Genre",
+    size = "Duration (min)",
+    alpha = "Volume (dBFS)"
+  )
+```
+
+***
+
+well, at least produced a graph....now for some analysis...:) 
+
+*** 
+
 
 ### Computational-Musicology {data-commentary-width="600"}
 
@@ -177,7 +347,7 @@ The interest stems from my scientific curiosity into the emotional and behaviora
 
 ![](images/IMG-6162.jpg){width="14cm"}
 
-### Introduction to analysis of music, made and selected on Spotify for 'relax(ation)'/'calming' {data-commentary-width="500"}
+### Introduction to the analysis of music for this project, selected on Spotify with keywords 'relax(ation)'/'calming' {data-commentary-width="500"}
 
 **For this project I have analysed playlists on Spotify which are named either 'calming' or 'relaxing' or 'relaxation' and qualified, selected & grouped them (eventually after some further research) fourfold as follows:**
 
@@ -228,7 +398,7 @@ Spotify playlist dogs scientific: [here](https://open.spotify.com/playlist/0km3m
 
 ------------------------------------------------------------------------
 
-### A global analysis of 4 relaxation playlists: humans, dogs, 'humansscience' and 'dogsscience'. Garbage and single variable oriented!!
+### (draft/garbage) A global analysis of 4 relaxation playlists: humans, dogs, 'humansscience' and 'dogsscience'. Garbage and single variable oriented!!
 
 ```{r, 1 single variable compared}
 combine4lists |>
