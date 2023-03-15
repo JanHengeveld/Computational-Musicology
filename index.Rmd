@@ -13,6 +13,8 @@ library(tidyverse)
 library(plotly)
 library(spotifyr)
 library(compmus)
+library(grid)
+library(gridExtra)
 ```
 
 ```{r,}
@@ -689,17 +691,17 @@ combine4lists <-
   ) +
   geom_point() +                   # Scatter plot.
   geom_rug(size = 0.1) +           # Add 'fringes' to show data distribution.
-  facet_wrap(~playlist_name) +           # Separate charts per country.
+  facet_wrap(~playlist_name, scales = "free") +           # Separate charts per country.
   scale_x_continuous(              # Fine-tune the x axis.
     limits = c(0, 200),
     breaks = c(0, 100, 200),        # Use grid-lines for quadrants only.
                 # Remove 'minor' grid-lines.
   ) +
-  scale_y_continuous(              # Fine-tune the y axis in the same way.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),
+  #scale_y_continuous(              # Fine-tune the y axis in the same way.
+  #  limits = c(0, 1),
+ #   breaks = c(0, 0.50, 1),
     
-  ) +
+ # ) +
   scale_colour_viridis_c(          # Use the cividis palette
     option = "E",                  # Qualitative set.
     alpha = 0.8,                   # Include some transparency
@@ -839,9 +841,6 @@ More analysis and/or separation of subjects to follow
 ***
 
 
-
-
-
 ### Homework for Week 9: chromagrams and cepstograms {data-commentary-width="400"}
 
 ```{r, selection of several songs for bla chroma analysis}
@@ -858,7 +857,7 @@ chromahuman <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |>
 ```
 
 ```{r, chroma bla for humans and dogs libeuclidian}
-chromahuman |>
+chromahumanweightless <- chromahuman |>
   mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
   compmus_gather_chroma() |> 
   ggplot(
@@ -874,7 +873,7 @@ chromahuman |>
   theme_minimal() +
   scale_fill_viridis_c()
 
-chromadog |>
+chromadogstotallybeached <- chromadog |>
   mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
   compmus_gather_chroma() |> 
   ggplot(
@@ -889,7 +888,7 @@ chromadog |>
   labs(x = "Time (s)", y = NULL, fill = "Magnitude", title = "Totally beached (Joshua Leeds)") +
   theme_minimal() +
   scale_fill_viridis_c()
-
+grid.arrange(chromahumanweightless, chromadogstotallybeached, ncol = 1)
 ```
 
 ------------------------------------------------------------------------
@@ -910,9 +909,11 @@ Totally Beached is a relative short song, where in the chromagram I believe to s
 
 ### Chromagram on science-based dogs relaxation song
 
+
+
 ### Cepstrograms
 
-```{r, cepstrograms first attempts}
+```{r, cepstrogram for Weightless Union}
 
 singlehumanscience <-
   get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |> # Change URI.
@@ -934,24 +935,6 @@ singlehumanscience <-
       )
   )
 ```
-
-```{r, cepstrogram on weightless}
-singlehumanscience|>
-  compmus_gather_timbre() |>
-  ggplot(
-    aes(
-      x = start + duration / 2,
-      width = duration,
-      y = basis,
-      fill = value
-    )
-  ) +
-  geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
-  scale_fill_viridis_c() +                              
-  theme_classic()
-```
-
 ```{r, cepstrograms on Totally Beached  first attempts this one for dogs}
 
 singledogsscience <-
@@ -975,8 +958,8 @@ singledogsscience <-
   )
 ```
 
-```{r, cepstrogram on Totally Beached}
-singledogsscience|>
+```{r, cepstrogram on weightless and totally beached combined}
+cepstrh <- singlehumanscience|>
   compmus_gather_timbre() |>
   ggplot(
     aes(
@@ -987,9 +970,27 @@ singledogsscience|>
     )
   ) +
   geom_tile() +
-  labs(x = "Time (s)", y = NULL, fill = "Magnitude") +
+  labs(x = "Time (s)", title = "Weightless (Marconi Union)", y = NULL, fill = "Magnitude") +
   scale_fill_viridis_c() +                              
   theme_classic()
+
+cepstrod <- singledogsscience|>
+  compmus_gather_timbre() |>
+  ggplot(
+    aes(
+      x = start + duration / 2,
+      width = duration,
+      y = basis,
+      fill = value
+    )
+  ) +
+  geom_tile() +
+  labs(x = "Time (s)", title = "Totally beached (Joshua Leeds)", y = NULL, fill = "Magnitude") +
+  scale_fill_viridis_c() +                              
+  theme_classic()
+grid.arrange(cepstrh, cepstrod, ncol = 1)
+```
+
 ```
 
 
