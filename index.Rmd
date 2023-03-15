@@ -354,15 +354,17 @@ well, at least produced a graph....now for some analysis...:)
 *** 
 
 
-### Computational-Musicology {data-commentary-width="600"}
+### Computational-Musicology     - "It's a dogs life"  {data-commentary-width="650"}
 
 This website describes my project for the course Computational Musicology in the third year of doing a Bachelors study Musicology at the University of Amsterdam (with a specialization in Music Cognition). The course deals with the use of computers as a tool for answering musicological questions.
 
 My project has initially aimed to search for music playlists on Spotify with keywords 'relax', 'relaxation' or 'calming'. Not only for humans but also -specifically- for dogs. There is a large quantity of music (artists, albums, playlists) available on Spotify with those keywords, also for dogs (and cats, jointly our most favorite pets to live with us, human beings).
 
-I attempt (present tense at this stage...) to -first broadly- search, then self-assemble and -select, compare, and (deeply) analyze music (playlists and individual songs) on Spotify, specifically searching for **similarities** and/or **differences** in 'calming/relaxing music' for humans and for dogs.
+I attempted to -first broadly- search, then self-assemble and -select, qualify, compare, and (deeply) analyze music (playlists and individual songs) on Spotify, specifically searching for **similarities** and/or **differences** in 'calming/relaxing music' for humans and for dogs.
 
 The interest stems from my scientific curiosity into the emotional and behavioral effects of sounds (specifically **musical** sounds in this project) for humans and animals (dogs here!) alike. Not least because of my love for my own pet dog, Tess, a 3-year-old Toller Retriever. Her well-being means the world to me and if we can understand the potential calming effects of sounds to dogs a bit better I hope this can assist in furthering the broad animal's well-being policies and guidelines.
+
+In the next tabs to the right, graphs and texts will provide insights into the various aspects 
 
 ------------------------------------------------------------------------
 
@@ -395,9 +397,9 @@ I based my fourth group, called on Spotify "Through a Dogs Ear, science-based su
 
 **My expectations about similarities and/or differences between these 4 groups in regards to the most important musical elements were roughly as follows:**
 
--   on Loudness, Energy, Speechiness and Danceability I expected all 4 groups to score low
--   on Tempo I expected all groups to be largely in the 60-80 BPM range (as research shows that a musical beat that is close to our heartrate is assistfull to relaxation)
--   on other elements I didn't formulate specific expectations beforehand
+- on Loudness, Energy and Danceability I expected all 4 groups to score low
+- on Tempo I expected all groups to be largely in the 60-80 BPM range (as research shows that a musical beat that is close to our (and dogs) heartrate is assistfull to relaxation)
+- on other elements like e.g. speechiness, instrumentalness or acousticness I didn't formulate specific expectations beforehand (but was rather surprised with some differences between playlists)
 
 ------------------------------------------------------------------------
 
@@ -486,6 +488,21 @@ combine4lists |>
   geom_violin()
 ```
 
+```{r, 1 single variable compared, acousticness}
+combine4lists |>
+    ggplot(aes(x = acousticness)) +
+  geom_histogram(binwidth = 0.1) +
+  facet_wrap(~category)
+combine4lists |>
+  ggplot(aes(x = category, y = acousticness)) +
+  geom_boxplot()
+combine4lists |>
+  ggplot(aes(x = category, y = acousticness)) +
+  geom_violin()
+```
+
+
+
 ```{r, 1 single variable compared; mode}
 combine4lists |>
   ggplot(aes(x = mode)) +
@@ -504,11 +521,12 @@ combine4lists |>
 
 ------------------------------------------------------------------------
 
+
+
 ```{r, scatterplots}
 
 dogs |> ggplot(aes(x = tempo, y = energy)) + geom_point() + geom_smooth()
 ## `geom_smooth()` using method = 'loess' and formula = 'y ~ x'
-
 
 ```
 
@@ -701,9 +719,10 @@ ggplotly(setup)
 
 ------------------------------------------------------------------------
 
-Comparing the 4 playlist on variables tempo (x) , energy (y), loudness (color) and instrumentalness (size) as can be seen in the chart left, brings up some interesting and unexpected differences. As mentioned earlier, I expected a lot of similarity on tempo and energy and loudness.
+Comparing the 4 playlist on variables tempo (x) , energy (y), loudness (color) and danceability (size) as can be seen in the chart left, brings up some interesting and unexpected differences. As mentioned earlier (see Tab Introduction), I expected a lot of similarity on tempo, energy, loudness and danceability (omitting speechiness here as variable).
 
 ### Further chroma analysis into a few selected songs
+
 
 ```{r, selection of several songs for chroma analysis}
 
@@ -724,9 +743,6 @@ chromadogoutlierswan <- get_tidy_audio_analysis("0U5ykKn6MpH5maeCCS3CrX") |>
 
 ```
 
-I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon the following research:
-
-<https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf>\>. This study concluded upon a top 10 list of most relaxing song, with Weightless as nr 1.
 
 ```{r, chroma for humans euclidian}
 chromahuman |>
@@ -747,7 +763,17 @@ chromahuman |>
 
 ```
 
+
+***
+
+I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon the following research:
+
+<https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf>\>. This study concluded upon a top 10 list of most relaxing song, with Weightless as nr 1.
+
+
 I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong Reggae 'vibe' to it and other research on the effect of music on calming dogs found that Reggae music was preferred by dogs (reference to article)
+
+***
 
 ```{r, chroma analysis for dogs}
 
@@ -970,7 +996,12 @@ singlehumanscience|>
   theme_classic()
 ```
 
-The above cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
+
+***
+
+This cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
+
+***
 
 ```{r, cepstrograms first attempts this one for dogs}
 
@@ -1054,7 +1085,7 @@ singledogsscience |>
   labs(x = "", y = "")
 ```
 
-```{r for SSM dogsscience, echo=FALSE, message=FALSE}
+``` {r for SSM dogsscience, echo=FALSE, message=FALSE}
 library(tidyverse)
 library(spotifyr)
 library(compmus)
@@ -1103,11 +1134,14 @@ bind_rows(
   labs(x = "", y = "")
 ```
 
+
 ### Concluding remarks
 
 DRAFT, bulletpoint like remarks:
 
 -   dogs playlist more strictly based on criteria for 'true' relaxation (e.g. tempo around 60-80; low energy); the definition for humans relaxation seems, even for the science-based list, more loosely formulated
+
+- the playlist humans science is based on a scientifically selected set of 10 most relaxing songs (with the aim of anxiety relief, e.g. pre-surgery). Yet, I find this list in terms of musical aspects like e.g. tempo, energy and speechiness not very well suited for true relaxation; I believe the definition of 'relaxation' for this group, as well as for the general playlist humans is less strict than the definition for the 2 playlists for dogs. The latter 2 are more strictly designed to calm (in terms of heartrate, blood pressure, etc.)
 
 - the bioacoustic aspects that research (partly leading to my 4th group dogs scientific) into calming effects of sounds to dogs have not been analysed. Spotify doesn't provide Nor does Spotify generate music above (but IN for dogs) the hearing frequency spectrum for humans
 
