@@ -723,7 +723,6 @@ Comparing the 4 playlist on variables tempo (x) , energy (y), loudness (color) a
 
 ### Further chroma analysis into a few selected songs
 
-
 ```{r, selection of several songs for chroma analysis}
 
 chromadog <- get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |>
@@ -743,7 +742,6 @@ chromadogoutlierswan <- get_tidy_audio_analysis("0U5ykKn6MpH5maeCCS3CrX") |>
 
 ```
 
-
 ```{r, chroma for humans euclidian}
 chromahuman |>
   mutate(pitches = map(pitches, compmus_normalise, "euclidean")) |>
@@ -762,18 +760,6 @@ chromahuman |>
   scale_fill_viridis_c()
 
 ```
-
-
-***
-
-I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon the following research:
-
-<https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf>\>. This study concluded upon a top 10 list of most relaxing song, with Weightless as nr 1.
-
-
-I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong Reggae 'vibe' to it and other research on the effect of music on calming dogs found that Reggae music was preferred by dogs (reference to article)
-
-***
 
 ```{r, chroma analysis for dogs}
 
@@ -813,54 +799,6 @@ chromadogoutlierswan |>
   scale_fill_viridis_c()
 ```
 
-```{r eval=FALSE, message=FALSE, include=FALSE}
-library(tidyverse)
-library(spotifyr)
-library(compmus)
-maria <-
-  get_tidy_audio_analysis("2MZSXhq4XDJWu6coGoXX1V") |>
-  compmus_align(bars, segments) |>
-  select(bars) |>
-  unnest(bars) |>
-  mutate(
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "acentre", norm = "manhattan"
-      )
-  ) |>
-  mutate(
-    timbre =
-      map(segments,
-        compmus_summarise, timbre,
-        method = "mean"
-      )
-  )
-bind_rows(
-  maria |>
-    compmus_self_similarity(pitches, "aitchison") |>
-    mutate(d = d / max(d), type = "Chroma"),
-  maria |>
-    compmus_self_similarity(timbre, "euclidean") |>
-    mutate(d = d / max(d), type = "Timbre")
-) |>
-  mutate() |>
-  ggplot(
-    aes(
-      x = xstart + xduration / 2,
-      width = xduration,
-      y = ystart + yduration / 2,
-      height = yduration,
-      fill = d
-    )
-  ) +
-  geom_tile() +
-  coord_fixed() +
-  facet_wrap(~type) +
-  scale_fill_viridis_c(guide = "none") +
-  theme_classic() +
-  labs(x = "", y = "")
-```
 
 ```{r, example for DTW based upon Ashleys template}
 
@@ -885,6 +823,24 @@ compmus_long_distance(
   theme_minimal() +
   scale_fill_viridis_c(guide = NULL)
 ```
+
+***
+
+I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon the following research:
+
+<https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf>\>. This study concluded upon a top 10 list of most relaxing song, with Weightless as nr 1.
+
+
+I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong Reggae 'vibe' to it and other research on the effect of music on calming dogs found that Reggae music was preferred by dogs (reference to article)
+
+
+More analysis and/or separation of subjects to follow
+
+***
+
+
+
+
 
 ### Homework for Week 9: chromagrams and cepstograms {data-commentary-width="400"}
 
@@ -996,14 +952,7 @@ singlehumanscience|>
   theme_classic()
 ```
 
-
-***
-
-This cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
-
-***
-
-```{r, cepstrograms first attempts this one for dogs}
+```{r, cepstrograms on Totally Beached  first attempts this one for dogs}
 
 singledogsscience <-
   get_tidy_audio_analysis("0SLtSDSjPupBUmrXtUNgPE") |> # Change URI.
@@ -1043,9 +992,17 @@ singledogsscience|>
   theme_classic()
 ```
 
-First indications make me think that flatness is indeed high in Totally Beached (the song for dogs based on science). Also a relative high level of c04 which could relate to the relative sharp 'attack' style of the strumming guitar with reggae. (more analysis to follow) ------
 
-###Self-Similarity Matrices###
+***
+
+This cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
+
+First indications make me think that flatness is indeed high in Totally Beached (the song for dogs based on science). Also a relative high level of c04 which could relate to the relative sharp 'attack' style of the strumming guitar with reggae. (more analysis to follow)
+
+***
+
+
+### Self-Similarity Matrices
 
 ```{r, self sim matrix on human single bla}
 singlehumanscience |>
@@ -1133,6 +1090,13 @@ bind_rows(
   theme_classic() +
   labs(x = "", y = "")
 ```
+
+***
+
+Explanation to follow
+
+***
+
 
 
 ### Concluding remarks
