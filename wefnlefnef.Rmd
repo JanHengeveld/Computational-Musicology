@@ -1,0 +1,31 @@
+---
+title: "testqsdqd"
+author: "Jan Hengeveld"
+date: "2023-03-19"
+output: html_document
+---
+
+### Concluding remarks {data-commentary-width="500"}
+
+![](images/dogearphone.jpg){width="14cm"}
+
+
+*** 
+
+DRAFT, bulletpoint like remarks:
+
+-   dogs playlist more strictly based on criteria for 'true' relaxation (e.g. tempo around 60-80; low energy); the definition for humans relaxation seems, even for the science-based list, more loosely formulated
+
+- I don't see the aspect of variation in the playlist dogs, science-based whereas this is mentioned in research as an important aspect for the desired effect (calming of dogs) 
+
+- the Spotify API doesn't fully work flawlessly, some musical elements are clearly wrong analysis and put in a data figure. Which means: listen often to the songs!
+
+- the playlist humans science is based on a scientifically selected set of 10 most relaxing songs (with the aim of anxiety relief, e.g. pre-surgery). Yet, I find this list in terms of musical aspects like e.g. tempo, energy and speechiness not very well suited for true relaxation; I believe the definition of 'relaxation' for this group, as well as for the general playlist humans is less strict than the definition for the 2 playlists for dogs. The latter 2 are more strictly designed to calm (in terms of heartrate, blood pressure, etc.)
+
+- the bioacoustic aspects that research (partly leading to my 4th group dogs scientific) into calming effects of sounds to dogs have not been analysed. Spotify doesn't provide Nor does Spotify generate music above (but IN for dogs) the hearing frequency spectrum for humans
+
+- the aspect of variations in music for dogs, to counter boredom, as described in [this research] as an important factor 
+
+
+***
+
