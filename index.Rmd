@@ -121,7 +121,7 @@ humansscience |> mutate(category = "Humansscience")
 )
 ```
 
-### Tempograms and novelty - Homework week 11
+### Tempograms and novelty - Homework week 11; a boxplot on tempo for my 4 playlists 
 
 ```{r, 1 single variable compared; tempo  sjwsjs}
 
@@ -148,7 +148,7 @@ The same applies to the tempo outlier "Leaves" (<https://open.spotify.com/track/
 singlehumanscience <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6")
 
 tempogramsfalseforweightless <- singlehumanscience |> 
-  tempogram(window_size = 4, hop_size = 2, cyclic = FALSE) |>
+  tempogram(window_size = 4, hop_size = 2, bpms = 60:240, cyclic = FALSE) |>
  ggplot(aes(x = time, y = bpm, fill = power)) +
   geom_raster() +
   scale_fill_viridis_c(guide = "none") +
@@ -156,7 +156,7 @@ tempogramsfalseforweightless <- singlehumanscience |>
   theme_classic()
 
 tempogramstrueforweightless <- singlehumanscience |>
-  tempogram(window_size = 4, hop_size = 2, cyclic = TRUE) |>
+  tempogram(window_size = 4, hop_size = 2, bpms = 60:120, cyclic = TRUE) |>
   ggplot(aes(x = time, y = bpm, fill = power)) +
   geom_raster() +
   scale_fill_viridis_c(guide = "none") +
@@ -165,12 +165,38 @@ tempogramstrueforweightless <- singlehumanscience |>
     # breaks = c(0, 100, 200) +
   labs(x = "Time (s)", title = "Weightless", y = "Tempo (BPM)") +
   theme_classic()
-  grid.arrange(tempogramsfalseforweightless, tempogramstrueforweightless, ncol = 1)
+  grid.arrange(tempogramsfalseforweightless, tempogramstrueforweightless, ncol = 2)
 ```
+
+
+```{r}
+pureshores <- get_tidy_audio_analysis("5uHnDHx5J48FdT6FjwA7Z8")
+
+tempogramsfalseforpureshores <- pureshores |> 
+  tempogram(window_size = 4, hop_size = 2, bpms = 60:240, cyclic = FALSE) |>
+ ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  labs(x = "Time (s)", title = "Pure Shores", y = "Tempo (BPM)") +
+  theme_classic()
+
+tempogramstrueforpureshores <- pureshores |>
+  tempogram(window_size = 4, hop_size = 2, bpms = 60:120, cyclic = TRUE) |>
+  ggplot(aes(x = time, y = bpm, fill = power)) +
+  geom_raster() +
+  scale_fill_viridis_c(guide = "none") +
+  #scale_y_continuous(              # Fine-tune the x axis.
+   # limits = c(0, 200),
+    # breaks = c(0, 100, 200) +
+  labs(x = "Time (s)", title = "Pure Shores", y = "Tempo (BPM)") +
+  theme_classic()
+  grid.arrange(tempogramsfalseforweightless, tempogramstrueforweightless, ncol = 2)
+```
+
 
 ------------------------------------------------------------------------
 
-it's difficult to assess any tempo-related aspects of this song, not least because (and this I know from the research that I looked at) the song Weightless is intendedly designed to start at 70 BPM and then -after some 5 minutes- slows down towards 60 BPM.
+It's difficult to assess any tempo-related aspects of this song from these 2 tempograms. I know (from the research that I looked at) that the song Weightless is **intendedly** designed to start at 70 BPM and then -after some 5 minutes- slows down towards 60 BPM. Reason: assisting in bringing heartrate down. Yet, hardly -if at all- to be seen in the tempograms: not the 70 BPM start nor the descend to 60. The problem relates to the fact that the song **does** have a (low on loudness but definitely consciously hearable) 4/4 meter-type beat but the chords elements are largely ambient-like synths without clear onsets. There **are** melodical elements but they play a minor role and don't necessarily occur in a structured/repetitive manner on anyone of the 4/4 meter beats.
 
 ------------------------------------------------------------------------
 
@@ -201,9 +227,9 @@ tempogramstrueforjoris <- jorisvoornexample |>
 
 ------------------------------------------------------------------------
 
-Just for fun I had a look at a song from a favorite Techno DJ of mine, Joris Voorn. The song is Polydub from album Four: <https://open.spotify.com/track/7fqAVya5281BFkUokiXAAB?si=44ac45f5d6a94528>
+Just for fun (and contrast) I had a look at a song from a favorite Techno DJ of mine, Joris Voorn. The song is Polydub from album Four: <https://open.spotify.com/track/7fqAVya5281BFkUokiXAAB?si=44ac45f5d6a94528>
 
-As can been seen very clearly: a typical 125 BPM style song.
+As can been seen very clearly: a typical 125 BPM style song. What also can be seen in the above Tempogram is the effect of 'tempo-octave' where multiple BPM doubles of 125 BPM can be seen in the graph. It is clear to me that Spotify has a much easier job in detecting a clear BPM pattern in a piece of music which is EDM-derived and has clearly articulated (and metered) percussion elements.
 
 ------------------------------------------------------------------------
 
@@ -366,131 +392,8 @@ dogs |> ggplot(aes(x = tempo, y = energy)) + geom_point() + geom_smooth()
 
 ```
 
-```{r, code from ashley}
-dogs |>                    # Start with awards.
-  mutate(
-    mode = ifelse(mode == 0, "Minor", "Major")
-  ) |>
-  ggplot(                     # Set up the plot.
-    aes(
-      x = loudness,
-      y = energy,
-      size = valence,
-      colour = mode
-    )
-  ) +
-  geom_point() +              # Scatter plot.
-  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
-  geom_text(                  # Add text labels from above.
-    aes(
-      x = valence,
-      y = energy,
-      label = label
-    ),
-    data = 
-      tibble(
-        label = c("Outlier", "ENERGY"),
-        category = c("Edisons", "Grammys"),
-        valence = c(0.090, 0.123),
-        energy = c(0.101, 0.967)
-      ),
-    colour = "black",         # Override colour (not mode here).
-    size = 3,                 # Override size (not loudness here).
-    hjust = "left",           # Align left side of label with the point.
-    vjust = "bottom",         # Align bottom of label with the point.
-    nudge_x = -0.05,          # Nudge the label slightly left.
-    nudge_y = 0.02            # Nudge the label slightly up.
-  ) +
-  facet_wrap(~ category) +    # Separate charts per playlist.
-  scale_x_continuous(         # Fine-tune the x axis.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
-    minor_breaks = NULL       # Remove 'minor' grid-lines.
-  ) +
-  scale_y_continuous(         # Fine-tune the y axis in the same way.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),
-    minor_breaks = NULL
-  ) +
-  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
-    type = "qual",            # Qualitative set.
-    palette = "Paired"        # Name of the palette is 'Paired'.
-  ) +
-  scale_size_continuous(      # Fine-tune the sizes of each point.
-    trans = "exp",            # Use an exp transformation to emphasise loud.
-    guide = "none"            # Remove the legend for size.
-  ) +
-  theme_light() +             # Use a simpler theme.
-  labs(                       # Make the titles nice.
-    x = "loudness",
-    y = "Energy",
-    colour = "Mode"
-  )
 
-```
 
-```{r, code from ashley2 TO BE SEEN AS EXAMPLE ONLY}
-humans |>                    # Start with awards.
-  mutate(
-    mode = ifelse(mode == 0, "Minor", "Major")
-  ) |>
-  ggplot(                     # Set up the plot.
-    aes(
-      x = valence,
-      y = energy,
-      size = loudness,
-      colour = mode
-    )
-  ) +
-  geom_point() +              # Scatter plot.
-  geom_rug(linewidth = 0.1) + # Add 'fringes' to show data distribution.
-  geom_text(                  # Add text labels from above.
-    aes(
-      x = valence,
-      y = energy,
-      label = label
-    ),
-    data = 
-      tibble(
-        label = c("OUtlier", "ENERGY"),
-        category = c("Edisons", "Grammys"),
-        valence = c(0.090, 0.123),
-        energy = c(0.101, 0.967)
-      ),
-    colour = "black",         # Override colour (not mode here).
-    size = 3,                 # Override size (not loudness here).
-    hjust = "left",           # Align left side of label with the point.
-    vjust = "bottom",         # Align bottom of label with the point.
-    nudge_x = -0.05,          # Nudge the label slightly left.
-    nudge_y = 0.02            # Nudge the label slightly up.
-  ) +
-  facet_wrap(~ category) +    # Separate charts per playlist.
-  scale_x_continuous(         # Fine-tune the x axis.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),   # Use grid-lines for quadrants only.
-    minor_breaks = NULL       # Remove 'minor' grid-lines.
-  ) +
-  scale_y_continuous(         # Fine-tune the y axis in the same way.
-    limits = c(0, 1),
-    breaks = c(0, 0.50, 1),
-    minor_breaks = NULL
-  ) +
-  scale_colour_brewer(        # Use the Color Brewer to choose a palette.
-    type = "qual",            # Qualitative set.
-    palette = "Paired"        # Name of the palette is 'Paired'.
-  ) +
-  scale_size_continuous(      # Fine-tune the sizes of each point.
-    trans = "exp",            # Use an exp transformation to emphasise loud.
-    guide = "none"            # Remove the legend for size.
-  ) +
-  theme_light() +             # Use a simpler theme.
-  labs(                       # Make the titles nice.
-    x = "loudness",
-    y = "Energy",
-    colour = "Mode"
-  )
-
-```
 
 ------------------------------------------------------------------------
 
@@ -726,7 +629,7 @@ On the left here are 2 cepstrograms, aimed at providing insights into the differ
 
 The cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
 
-For the second cepstrogram: first indications make me think that flatness is indeed high in Totally Beached (the song for dogs based on science). Also a relative high level of c04 which could relate to the relative sharp 'attack' style of the strumming guitar with reggae. (more analysis to follow)
+For the second cepstrogram: first indications make me think that flatness is indeed high in Totally Beached (an archetype song from the dogs science based playlist). Also a relative high level of c04 which could relate to the relative sharp 'attack' style of the strumming guitar with reggae. (more analysis to follow)
 
 ------------------------------------------------------------------------
 
