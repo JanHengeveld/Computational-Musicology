@@ -125,58 +125,24 @@ humansscience |> mutate(category = "Humansscience")
 
 ```{r, 1 single variable compared; tempo  sjwsjs}
 
-#tempogramsoverview <- 
-#combine4lists |>
-# geom_histogram(binwidth = 0.1) +
- # facet_wrap(~category)
+
 combine4lists |>
  ggplot(aes(x = category, y = tempo)) +
   geom_boxplot()
-# combine4lists |>
-#  ggplot(aes(x = category, y = tempo)) +
-#  geom_violin()
+
 ```
-***
 
-When looking at this boxplot, it strikes me that only the playlist 'dogs' has a mean around 78 BPM and the other 3 playlists are higher, even the 2 'scientific' ones. Also striking: the mean (and little SD) in the 'Humans' playlist around 120 BPM. I had expected for both science-based lists to have the tempo around 60-80 BPM (for synchronization purposes with humans and dogs rest heartrate) but no such thing; the dogsscience list even has a higher average than the regular dogs list. 
+------------------------------------------------------------------------
 
-When listening to the extreme outliers regarding tempo I can safely assume that the Spotify API isn't working flawlessly: e.g. the 'fastest' song from the dogsscience playlist is "Chorale Prelude No. 5 “Ach bleib bei uns Herr Jesu Christ” in B-Flat Major, BWV 649 (Harp Version)"
-and analysed at 200 BPM by Spotify: https://open.spotify.com/track/2Chgj5q0NgvBlFvzYVJvUa?si=5592371b98464c2d
+When looking at this boxplot, it strikes me that only the playlist 'dogs' has a mean around 78 BPM and the other 3 playlists are higher, even the 2 'scientific' ones. Also striking: the mean (and little SD) in the 'Humans' playlist around 120 BPM. I had expected for both science-based lists to have the tempo around 60-80 BPM (for synchronization purposes with humans and dogs rest heartrate) but no such thing; the dogsscience list even has a higher average than the regular dogs list.
 
-The same applies to the tempo outlier "Leaves" (https://open.spotify.com/track/60YvUB0fCvLlTDCc99wpgD?si=5f3c0edf44fd4713) for the regular dogs playlist, clocked at 204 BPM. When listening it's apparently wrong. It's a piano-only piece of music with clearly some rubato-syle tempo changes. 
+When listening to the extreme outliers regarding tempo I can safely assume that the Spotify API isn't working flawlessly: e.g. the 'fastest' song from the dogsscience playlist is "Chorale Prelude No. 5 "Ach bleib bei uns Herr Jesu Christ" in B-Flat Major, BWV 649 (Harp Version)" and analysed at 200 BPM by Spotify: <https://open.spotify.com/track/2Chgj5q0NgvBlFvzYVJvUa?si=5592371b98464c2d>
 
-***
+The same applies to the tempo outlier "Leaves" (<https://open.spotify.com/track/60YvUB0fCvLlTDCc99wpgD?si=5f3c0edf44fd4713>) for the regular dogs playlist, clocked at 204 BPM. When listening it's apparently wrong. It's a piano-only piece of music with clearly some rubato-syle tempo changes.
+
+------------------------------------------------------------------------
 
 ### Tempograms continued
-
-```{r}
-
-# singlehumanscience <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6") |>
-#  select(segments) |>
- # unnest(segments)
-
-#singlehumanscience |>
-#  mutate(loudness_max_time = start + loudness_max_time) |>
-#  arrange(loudness_max_time) |>
-#  mutate(delta_loudness = loudness_max - lag(loudness_max)) |>
-#  ggplot(aes(x = loudness_max_time, y = pmax(0, delta_loudness))) +
-#  theme_minimal() +
-#  labs(x = "Time (s)", y = "Novelty")
-
-#singlehumanscience |>
-#  mutate(pitches = map(pitches, compmus_normalise, "clr")) |>
-#  arrange(start) |>
-#  mutate(pitches = map2(pitches, lag(pitches), `-`)) |>
-#  slice(-1) |> 
-#  compmus_gather_chroma() |> 
-#  group_by(start, duration) |> 
-#  summarise(novelty = sum(log1p(pmax(value, 0)))) |> 
-#  ggplot(aes(x = start + duration / 2, y = novelty)) +
-#  geom_line() +
-#  xlim(0, 500) +
-#  theme_minimal() +
-#  labs(x = "Time (s)", y = "Novelty")
-```
 
 ```{r}
 singlehumanscience <- get_tidy_audio_analysis("6kkwzB6hXLIONkEk9JciA6")
@@ -202,14 +168,11 @@ tempogramstrueforweightless <- singlehumanscience |>
   grid.arrange(tempogramsfalseforweightless, tempogramstrueforweightless, ncol = 1)
 ```
 
+------------------------------------------------------------------------
 
+it's difficult to assess any tempo-related aspects of this song, not least because (and this I know from the research that I looked at) the song Weightless is intendedly designed to start at 70 BPM and then -after some 5 minutes- slows down towards 60 BPM.
 
-***
-
-it's difficult to assess any tempo-related aspects of this song, not least because (and this I know from the research that I looked at) the song Weightless is intendedly designed to start at 70 BPM and then -after some 5 minutes- slows down towards 60 BPM. 
-
-***
-
+------------------------------------------------------------------------
 
 ### Tempograms continued extra week 11 (totally different genre)
 
@@ -236,15 +199,13 @@ tempogramstrueforjoris <- jorisvoornexample |>
   grid.arrange(tempogramsfalseforjoris, tempogramstrueforjoris, ncol = 1)
 ```
 
-***
+------------------------------------------------------------------------
 
-Just for fun I had a look at a song from a favorite Techno DJ of mine, Joris Voorn. The song is Polydub from album Four: https://open.spotify.com/track/7fqAVya5281BFkUokiXAAB?si=44ac45f5d6a94528
+Just for fun I had a look at a song from a favorite Techno DJ of mine, Joris Voorn. The song is Polydub from album Four: <https://open.spotify.com/track/7fqAVya5281BFkUokiXAAB?si=44ac45f5d6a94528>
 
-As can been seen very clearly: a typical 125 BPM style song. 
+As can been seen very clearly: a typical 125 BPM style song.
 
-***
-
-
+------------------------------------------------------------------------
 
 ### Computational-Musicology - "It's a dogs life" {data-commentary-width="650"}
 
@@ -761,7 +722,7 @@ grid.arrange(cepstrh, cepstrod, ncol = 1)
 
 ------------------------------------------------------------------------
 
-On the left here are 2 cepstrograms, aimed at providing insights into the different timbre aspects of music.  
+On the left here are 2 cepstrograms, aimed at providing insights into the different timbre aspects of music.
 
 The cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
 
@@ -1091,4 +1052,3 @@ DRAFT, bulletpoint like remarks:
 -   the aspect of variations in music for dogs, to counter boredom, as described in [this research] as an important factor
 
 ------------------------------------------------------------------------
-
