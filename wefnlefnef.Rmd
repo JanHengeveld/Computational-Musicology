@@ -3,11 +3,38 @@ title: "testqsdqd"
 author: "Jan Hengeveld"
 date: "2023-03-19"
 output: html_document
+
+
 ---
+
+<style type="text/css">
+  body{
+  font-size: 16pt;
+}
+</style>
+
 
 ### Concluding remarks {data-commentary-width="500"}
 
 ![](images/dogearphone.jpg){width="14cm"}
+
+### awdjqwfd
+
+***
+
+**TOTALLY BEACHED**
+
+I selected the song "Totally beached" from the fourth group (dogs, science-based) for a further analysis because it has a strong reggae 'vibe' to it and [certain research](https://www.scottishspca.org/news/reggae-gets-paw-of-approval) on the effect of music on calming dogs found that reggae music (together with soft rock and classic) is a genre preferred by dogs.
+
+Totally Beached is a relative short song, where in the chromagram I believe to see a clear reggae-style appearance of offbeat chord elements. The song follows a classic reggae chord development between I and IV (in this case G minor and C minor). What surprises me in the chrogram is a relative small prominence of Eb, the terts in C minor. The last 10 seconds are a fading-out stall of the applied instruments, hanging on to a single C-dominated finale.
+
+
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0SLtSDSjPupBUmrXtUNgPE?utm_source=generator"  allowfullscreen="" width="100%" height="85" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> 
+
+ 
+***
+
+
 
 
 *** 
