@@ -1,0 +1,18 @@
+---
+title: "Relaxing/Calming aspects of music for humans and dogs"
+author: "Jan Hengeveld"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    theme:
+      primary: "#f59842"
+      navbar_bg: "##f5b042"
+---
+
+```{=html}
+<style type="text/css">
+  body{
+  font-size: 12pt;
+}
+</style>
+```

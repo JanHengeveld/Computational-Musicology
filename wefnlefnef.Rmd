@@ -56,3 +56,80 @@ DRAFT, bulletpoint like remarks:
 
 ***
 
+``` {r}
+clusteringdogsscience <-
+  get_playlist_audio_features("bnfcollection", "7fDYYm1v0QKoyj7c8rbCul") |>
+  add_audio_analysis() |>
+  mutate(
+    segments = map2(segments, key, compmus_c_transpose),
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      ),
+    timbre =
+      map(
+        segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  ) |>
+  mutate(pitches = map(pitches, compmus_normalise, "clr")) |>
+  mutate_at(vars(pitches, timbre), map, bind_rows) |>
+  unnest(cols = c(pitches, timbre))
+```
+
+
+```{r}
+rand_dogs <- clusteringdogsscience[sample(nrow(clusteringdogsscience), size=50),]
+```
+
+```{r}
+clusteringdogsscience_juice <-
+  recipe(
+    track.name ~
+      danceability +
+      energy +
+      loudness +
+      speechiness +
+      acousticness +
+      instrumentalness +
+      liveness +
+      valence +
+      tempo +
+      duration +
+      C + `C#|Db` + D + `D#|Eb` +
+      E + `F` + `F#|Gb` + G +
+      `G#|Ab` + A + `A#|Bb` + B +
+      c01 + c02 + c03 + c04 + c05 + c06 +
+      c07 + c08 + c09 + c10 + c11 + c12,
+    data = rand_dogs
+  ) |>
+  step_center(all_predictors()) |>
+  step_scale(all_predictors()) |> 
+  # step_range(all_predictors()) |> 
+  prep(rand_dogs |> mutate(track.name = str_trunc(track.name, 5000))) |>
+  juice() |>
+  column_to_rownames("track.name")
+```
+
+```{r}
+clusteringdogs_dist <- dist(clusteringdogsscience_juice, method = "euclidean")
+```
+
+```{r}
+clusteringdogs_dist |> 
+  hclust(method = "complete") |> # Try single, average, and complete.
+  dendro_data() |>
+  ggdendrogram()
+```
+
+```{r}
+heatmaply(
+  clusteringdogsscience_juice,
+  hclustfun = hclust,
+  hclust_method = "average",  # Change for single, average, or complete linkage.
+  dist_method = "euclidean"
+)
+```
+

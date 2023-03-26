@@ -1,13 +1,12 @@
 ---
 title: "Relaxing/Calming aspects of music for humans and dogs"
 author: "Jan Hengeveld"
-output:
+output: 
   flexdashboard::flex_dashboard:
-    theme:
-      primary: "#eb9534"
-      navbar-bg: "#eb9634"
     storyboard: true
-    self_contained: false
+    theme:
+      primary: "#f59842"
+      navbar_bg: "#f5b042"
 ---
 
 <style type="text/css">
@@ -17,7 +16,6 @@ output:
 </style>
 
 
-
 ```{r, setup}
 
 library(tidyverse)
@@ -25,6 +23,7 @@ library(plotly)
 library(spotifyr)
 library(compmus)
 library(grid)
+library(knitr)
 library(gridExtra)
 library(heatmaply)
 library(ggdendro)
@@ -136,6 +135,106 @@ humansscience |> mutate(category = "Humansscience")
 ```
 
 
+
+### Classification and clustering
+
+```{r}
+library(compmus)
+
+get_conf_mat <- function(fit) {
+  outcome <- .get_tune_outcome_names(fit)
+  fit |>
+    collect_predictions() |>
+    conf_mat(truth = outcome, estimate = .pred_class)
+}  
+
+get_pr <- function(fit) {
+  fit |>
+    conf_mat_resampled() |>
+    group_by(Prediction) |> mutate(precision = Freq / sum(Freq)) |>
+    group_by(Truth) |> mutate(recall = Freq / sum(Freq)) |>
+    ungroup() |> filter(Prediction == Truth) |>
+    select(class = Prediction, precision, recall)
+}
+```
+
+```{r}
+clusteringdogsscience <-
+  get_playlist_audio_features("bnfcollection", "0km3mDUsP3LYDS1BZfqsY5") |>
+  add_audio_analysis() |>
+  mutate(
+    segments = map2(segments, key, compmus_c_transpose),
+    pitches =
+      map(segments,
+        compmus_summarise, pitches,
+        method = "mean", norm = "manhattan"
+      ),
+    timbre =
+      map(
+        segments,
+        compmus_summarise, timbre,
+        method = "mean"
+      )
+  ) |>
+  mutate(pitches = map(pitches, compmus_normalise, "clr")) |>
+  mutate_at(vars(pitches, timbre), map, bind_rows) |>
+  unnest(cols = c(pitches, timbre))
+```
+
+```{r}
+rand_dogs <- clusteringdogsscience[sample(nrow(clusteringdogsscience), size=30),]
+```
+
+```{r uvvhjvefjsdjbskjdv}
+clusteringdogsscience_juice <-
+  recipe(
+    track.name ~
+      danceability +
+      energy +
+      loudness +
+      valence +
+      duration + 
+      acousticness + 
+      tempo,
+    data = rand_dogs
+  ) |>
+  step_center(all_predictors()) |>
+  step_scale(all_predictors()) |>
+  # step_range(all_predictors()) |>
+  prep(rand_dogs |> mutate(track.name = str_trunc(track.name, 20))) |>
+  juice() |>
+  column_to_rownames("track.name")
+```
+
+```{r}
+clusteringdogs_dist <- dist(clusteringdogsscience_juice, method = "euclidean")
+```
+
+```{r}
+
+
+heatmaply(
+  clusteringdogsscience_juice,
+  hclustfun = hclust,
+  hclust_method = "average",  # Change for single, average, or complete linkage.
+  dist_method = "euclidian"
+)
+```
+
+***
+
+I did a random selection of 30 songs from the playlist 4, dogsscience, to look at some clustering features.
+
+Not surprisingly: energy and loudness are clustered together. Then valence comes together with these. Danceability and tempo are added furtheron. 
+
+The clearest outlier, by far, is the song "Violin Partida No 2. (sic, a purely harpsichord based piece of music, called "Violin..."!) On loudness and -to a lesser extend- valence and loudness. When listening to [this song](https://open.spotify.com/track/3ljSpw1GiiHT8vKwRhHoS3?si=6b8cd824e89f4f48) I can easily understand the high scores on these 3 variables. 
+
+More analysis to follow
+
+
+***
+
+
 ### Computational-Musicology - "It's a dogs life" {data-commentary-width="650"}
 
 This website describes my project for the course Computational Musicology in the third year of doing a Bachelors study Musicology at the University of Amsterdam (with a specialization in Music Cognition). The course deals with the use of computers as a tool for answering musicological questions.
@@ -152,26 +251,26 @@ In the next tabs to the right, graphs and texts will provide some insights into 
 
 ![](images/IMG-6162.jpg){width="14cm"}
 
-***
+------------------------------------------------------------------------
 
-### Introduction to the analysis of music for this project, selected on Spotify with keywords 'relax(ation)'/'calming' {data-commentary-width="500"}
+### Introduction to the analysis of music for this project, selected on Spotify with keywords 'relax(ation)'/ 'calming'; four playlists defined {data-commentary-width="350"}
 
-**For this project I have analysed playlists on Spotify which are named either 'calming' or 'relaxing' or 'relaxation' and qualified, selected & grouped them (eventually after some further research) fourfold as follows:**
+**For this project I have analysed playlists on Spotify with keywords 'calming' or '(relax)ing' or 'relaxation'. I qualified, selected & grouped them (eventually after looking at some scientific research, see below) fourfold as follows:**
 
 1.  general relaxation playlist for humans ("Humans")
 2.  general relaxation playlist for dogs ("Dogs")
-3.  specific relaxation playlist for humans, based upon scientific research ("Humansscience")
+3.  specific relaxation playlist for humans, based upon (some) scientific research ("Humansscience")
 4.  specific relaxation playlist for dogs, based upon (some) scientific research ("Dogsscience")
 
 All 4 are own-made playlists/groups.
 
 The **overall corpus** is made from songs from many playlists on Spotify that exist for those keywords. It is my working hypothesis that the first two playlists are hardly different and that a high level of anthropomorphism is applicable =\> we assume that what humans define and perceive as relaxing music will be true for dogs also and -hence- playlist 2 is based (assumption!) on similar criteria/elements as for playlist 1.
 
-Multiple research from various disciplines (neurosciences, psychology, biology, animal studies, some in cooperation with musicologists) has been done into calming/relaxing effects of music, both for humans as for dogs. For the first and third group, humans, we know much more given a broader spectrum of feedback: we have language as feedback system whereas with dogs we are limited to observing their behavior and measuring bodily aspects like blood pressure, heartrate or hormone levels (like cortisol, the 'stress hormone'). 
+Multiple research from various disciplines (neurosciences, psychology, biology, animal studies, some in cooperation with musicologists) has been done into calming/relaxing effects of music, both for humans as for dogs. For the first and third group, humans, we know much more given a broader spectrum of feedback: we have language as feedback system whereas with dogs we are limited to observing their behavior and measuring bodily aspects like blood pressure, heartrate or hormone levels (like cortisol, the 'stress hormone').
 
-With music for dogs, research shows that similar musical aspects towards calming apply as for humans (energy, loudness, pitch, instruments) but also differences (variety, genre, 'nature' sounds). Refer to e.g. [Bowman, 2017](https://www.sciencedirect.com/science/article/abs/pii/S0031938416306977) wherein is stated that "..the effect of habituation may be reduced by increasing the variety of auditory enrichment provided." (end of Abstract)
+With music for dogs, research shows that similar musical aspects towards calming apply as for humans (energy, loudness, pitch, instruments) but also differences (variety, genre, 'nature' sounds). On the aspect of **variety** I refer specifically to [Bowman, 2017](https://www.sciencedirect.com/science/article/abs/pii/S0031938416306977) wherein is stated that "..the effect of habituation may be reduced by increasing the variety of auditory enrichment provided." (end of Abstract). In simple words: dogs get habituated (i.e. bored) when there's little variety in music styles/genres and the calming effect of music dilutes.
 
-Group 3 and 4, defined on certain scientific research, may show significant differences with groups 1 and 2 on a variety of musical 'elements'. Also between groups 3 and 4, I wanted to analyze similarities and -especially- search for differences.
+Groups 3 and 4, defined on **certain** (bear in mind: I limited myself to just a few studies, see below) scientific research, may show (significant) differences with groups 1 and 2 on a variety of musical 'elements'. Also between groups 3 and 4, I wanted to analyze similarities and -especially- search for differences.
 
 All but 1 (nr. 3) playlists are large, i.e. \> 200 songs each. Nr. 3 only contains 10 songs.
 
@@ -179,19 +278,18 @@ All but 1 (nr. 3) playlists are large, i.e. \> 200 songs each. Nr. 3 only contai
 
 It might also be that 'true' calming music for dogs is based on musical elements that disqualify for humans as true music (i.e. pitches in sounds at frequency levels unhearable for humans but hearable for dogs. This is not in scope for this project, one reason being is that Spotify doesn't contain (high-pitched) sounds that are non-perceivable for humans but that dogs CAN hear.
 
-My 3d group is based upon research into the most relaxing (i.e. anxiety reducing) songs for humans: [neuroscience on anxiety reduction](https://www.inc.com/melanie-curtin/neuroscience-says-listening-to-this-one-song-reduces-anxiety-by-up-to-65-percent.html) with [official playlist](https://open.spotify.com/playlist/71mRGOhRHXZRSbQzouuFw7?si=7879ee525f3d4980). I quote from this article "...participants listened to different songs while researchers measured brain activity as well as physiological states that included heart rate, blood pressure, and rate of breathing." The song elected as nr 1 in a top 10 of most relaxing songs is **"Weightless"** by **Marconi Union** (a song which will be deeply analysed in the next tabs). I further quote: "Equally remarkable is the fact the song was actually constructed to do so. The group that created"Weightless", Marconi Union, did so in collaboration with sound therapists. Its carefully arranged harmonies, rhythms, and bass lines help slow a listener's heart rate, reduce blood pressure and lower levels of the stress hormone cortisol." The group I created for this research is an exact copy of this top 10.
+My 3d group is based upon this research into the most relaxing (i.e. anxiety reducing) songs for humans: [neuroscience on anxiety reduction](https://www.inc.com/melanie-curtin/neuroscience-says-listening-to-this-one-song-reduces-anxiety-by-up-to-65-percent.html) with [official playlist](https://open.spotify.com/playlist/71mRGOhRHXZRSbQzouuFw7?si=7879ee525f3d4980). I quote from this article "...participants listened to different songs while researchers measured brain activity as well as physiological states that included heart rate, blood pressure, and rate of breathing." The song elected as nr 1 in a top 10 of most relaxing songs is **"Weightless"** by **Marconi Union** (a song which will be deeply analysed in the next tabs). I further quote: "Equally remarkable is the fact the song was actually constructed to do so. The group that created"Weightless", Marconi Union, did so in collaboration with sound therapists. Its carefully arranged harmonies, rhythms, and bass lines help slow a listener's heart rate, reduce blood pressure and lower levels of the stress hormone cortisol." The group I created for this research is an exact copy of this top 10.
 
-I based my fourth group, called on Spotify "Through a Dogs Ear, science-based supposedly" upon the following paper and the available public playlists in Spotify labeled (published by authors of this research). See ["Through a Dogs Ear"](https://icalmpet.com/wp-content/uploads/BioAcoustic-Research-and-Development-Executive-Summary.pdf). Also have a look at [a review of Leeds work](https://www.coldnosecompanions.com/wp-content/uploads/2020/01/Through-a-Dogs-Ear-Review.pdf) The emphasis of this research is very much on a concept called **psycho- and bioacoustics** I quote: "Psychoacoustics is the discipline that studies the perception of sound in humans. This includes how we listen, our psychological responses, and the physiological impact of music and sound on the human nervous system. Bioacoustics is the study of sound in animals. It looks at how animals communicate, as well as the positive and negative effects of sound in their environments." 
-However, the claims by the authors of "Through a Dogs Ear" are refuted in a recent summary article from 2020, ["Musical Dog"](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7022433/) regarding the use of music towards dogs behaviour and well-being, stating (in Abstract): "Overall, exposure to classical music appears to have a calming influence on dogs in stressful environments, with no additional benefit observed from any music purposely designed for dogs (specifically “Through a dog’s ear”)."
+I based my fourth group, called on Spotify "Through a Dogs Ear, science-based supposedly" upon the following paper and the available public playlists in Spotify labeled (published by authors of this research). See ["Through a Dogs Ear"](https://icalmpet.com/wp-content/uploads/BioAcoustic-Research-and-Development-Executive-Summary.pdf). Also have a look at [a review of Leeds work](https://www.coldnosecompanions.com/wp-content/uploads/2020/01/Through-a-Dogs-Ear-Review.pdf) The emphasis of this research is very much on a concept called **psycho- and bioacoustics** I quote: "Psychoacoustics is the discipline that studies the perception of sound in humans. This includes how we listen, our psychological responses, and the physiological impact of music and sound on the human nervous system. Bioacoustics is the study of sound in animals. It looks at how animals communicate, as well as the positive and negative effects of sound in their environments." However, the claims by the authors of "Through a Dogs Ear" are refuted in a recent summary article from 2020, ["Musical Dog"](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7022433/) regarding the use of music towards dogs behaviour and well-being, stating (in Abstract): "Overall, exposure to classical music appears to have a calming influence on dogs in stressful environments, with no additional benefit observed from any music purposely designed for dogs (specifically"Through a dog's ear")."
 
-(For those really interested: [Animals](https://www.mdpi.com/journal/animals) is a well-known scientific magazine focused entirely on animals. 
+(For those really interested: [Animals](https://www.mdpi.com/journal/animals) is a well-known scientific magazine focused entirely on animals.
 
 **My expectations/assumptions about similarities and/or differences between these 4 groups in regards to the most important musical elements were roughly as follows:**
 
 -   on Loudness, Energy and Danceability I expected all 4 groups to score low
 -   on Tempo I expected all groups to be largely in the 60-80 BPM range (as research shows that a musical beat that is close to our (and dogs) heartrate is assistful to relaxation)
 -   on other elements like e.g. speechiness, instrumentalness or acousticness I didn't formulate specific expectations beforehand (but was rather surprised with some differences between playlists, see next tab)
--   for the playlist 4 (dogs, science-based) I expected the aspect of 'bioacoustics' to be largely represented in the combined Spotify elements tempo, loudness, danceability and energy; it's near-impossible to weigh the importance of each of these aspects although tempo seems to be a crucial element. Also I was curious to delve into timbre aspects of the dogs science-based playlist to see if there are some common characteristics. 
+-   for the playlist 4 (dogs, science-based) I expected the aspect of 'bioacoustics' to be largely represented in the combined Spotify elements tempo, loudness, danceability and energy; it's near-impossible to weigh the importance of each of these aspects although tempo seems to me a crucial element. Also I was curious to delve into timbre aspects of the dogs science-based playlist to see if there are some common characteristics.
 
 ------------------------------------------------------------------------
 
@@ -213,13 +311,13 @@ Spotify playlist dogs scientific: [here](https://open.spotify.com/playlist/0km3m
 
 ------------------------------------------------------------------------
 
-### A first  analysis of some single musical elements across the 4  playlists {data-commentary-width="550"}
+### A first analysis of some single musical elements across the 4 playlists {data-commentary-width="550"}
 
 ```{r}
 akoestiek <- combine4lists |>
-    ggplot(aes(x = acousticness)) +
-  geom_histogram(binwidth = 0.1) +
-  facet_wrap(~category)
+   ggplot(aes(x = category, y = acousticness)) +
+  
+  geom_boxplot()
 
 instrumentaliteit <- combine4lists |>
   ggplot(aes(x = instrumentalness)) +
@@ -238,22 +336,23 @@ modus <- combine4lists |>
 grid.arrange(akoestiek, instrumentaliteit, valentie, modus, ncol = 2)
 ```
 
+------------------------------------------------------------------------
 
+I started my analysis of the playlists with a comparison on some single elements between the 4 groups. To the left here I present 4 graphs on individual variables in the playlists and I focus on some musical elements for which I had **no** 'hard' or explicit expectations on what the outcomes would be: on acousticness, instrumentalness, valence and mode. Bear in mind that the playlist "humansscience" only contains 10 songs, hence the low bars in the histograms.
 
+First, acousticness: a surprising difference between the 2 dogs playlists and -especially- the playlist humans.
+
+why histogram for mode: mode is a discrete value (0 or 1 and nothing inbetween) and that's why a histogram is the better way of displaying. The adjacent violin plot on valence has relative low values for
+
+Tempo : the higher the happier the music (valence), the slower the music the sadder.
+
+Really intriguing: both dogs playlists score higher on major mode than minor (regular dogs significantly) BUT....this does NOT correlate with a higher valence figures for these playlists. Whereas normally the major mode is associated with positive valence.
+
+I believe that tempo plays the role here of 'party pooper' on the correlation between mode and valence.
 
 ------------------------------------------------------------------------
 
-I started my analysis of the playlists with a comparison on some single elements between the 4 groups. To the left here I present 4 graphs on individual variables in the playlists and I focus on some musical elements for which I had **no** 'hard' or explicit expectations on what the outcomes would be: on acousticness, instrumentalness, valence and mode. Bear in mind that the playlist "humansscience" only contains 10 songs, hence the low bars in the histograms. 
-
-First, acousticness: a surprising difference between the 2 Dogs playlists and the playlist humans
-
-why histogram for mode: mode is a discrete value (0 or 1 and nothing inbetween) and that's why a histogram is the better way of displaying
-
-
-
-------------------------------------------------------------------------
-
-### Combined analysis of 4 key musical elements, observed over the 4 playlists {data-commentary-width="450"}
+### Combined analysis of 4 key musical elements, observed over the 4 playlists {data-commentary-width="550"}
 
 ```{r, 4 categories compared}
 
@@ -310,9 +409,9 @@ ggplotly(setup)
 
 ------------------------------------------------------------------------
 
-Comparing the 4 playlist on **key musical elements** tempo (x) , energy (y), loudness (color) and danceability (size) as can be seen in the chart left, brings up some interesting and unexpected differences. As mentioned earlier (see Tab "Introduction..."), I expected a lot of similarity across the playlists on these 4 variables (omitting speechiness here as variable). Much to my surprise, there are much bigger differences than I presumed.
+Comparing the 4 playlists on **key musical elements** tempo (x) , energy (y), loudness (color) and danceability (size) as can be seen in the chart left, brings up some interesting and unexpected differences. As mentioned earlier (see Tab "Introduction..."), I expected a lot of similarity across the playlists on these 4 variables (omitting speechiness here as variable). Much to my surprise, there are much bigger differences than I presumed.
 
-Both dogs playlists score significantly lower on energy than the 2 human playlists. Bear in mind when comparing these graphs that the y axis (for energy) has a different scales for each playlist which means that the differences are even more dramatic!
+Both dogs playlists score significantly lower on energy than the 2 human playlists. Bear in mind when comparing these graphs that the y axis (for energy) has a different scales for each playlist which means that the differences between humans and dogs are even more dramatic!
 
 The same applies for loudness, where the human playlists score high (yellow) and the dogs playlists much lower (blue).
 
@@ -320,13 +419,13 @@ Tempo for humans centers around 120 BPM whereas for dogs it much more in the 60-
 
 On danceability also a difference can be seen (on average the dogs playlists have many more smaller cells) but not as big as with the other 3 variables.
 
-What mostly struck me is the wide spread of the songs in playlist 3 humans science-based, across these 4 variables. As these 10 songs - supposedly- form a top 10 of most relaxing song for humans (specifically: to relief anxiety and stress e.g. pre-surgery) why do they not score similarly or at least near to the nr 1. (i.e. most relaxing) song on that list: Weightless by Marconi Union? I selected this as the 'archetype' song for this playlist.
+What mostly struck me is the wide spread of the songs in playlist 3 humans science-based, across these 4 variables. As these 10 songs - supposedly- form a top 10 of most relaxing song for humans (specifically: to relief anxiety and stress e.g. pre-surgery) why do they not score similarly or at least near to the nr 1. (i.e. most relaxing) song on that list: [Weightless by Marconi Union](https://open.spotify.com/track/6kkwzB6hXLIONkEk9JciA6?si=d4a832d2eef54ec5)? I selected this as the 'archetype' song for this playlist.
 
-From playlist nr. 4,  
+With playlist nr. 4, there appears at first sight a -seemingly large- difference on energy (y-axis) level BUT the y-axis are differently scaled so on closer look they are comparable on energy level. For this playlist I chose the song [Totally Beached by Joshua Leeds](https://open.spotify.com/track/0SLtSDSjPupBUmrXtUNgPE?si=bb2db41ce65d445d) as 'archetype' song for this playlist. Partly I chose this because the song has a reggae style 'vibe' to it and this [research](http://eprints.gla.ac.uk/135846/) has identified reggae as a preferred genre by dogs (from a relaxation perspective).
 
 ------------------------------------------------------------------------
 
-### Analysis of 2 **'archetype'** songs in terms of chroma features (providing pitch class insights) as can be seen in chromagrams {data-commentary-width="600"}
+### Analysis of 2 **'archetype'** songs in terms of chroma features (providing pitch class insights) as can be seen in chromagrams {data-commentary-width="450"}
 
 ```{r, selection of several songs for bla chroma analysis}
 
@@ -382,7 +481,7 @@ grid.arrange(chromahumanweightless, chromadogstotallybeached, ncol = 1)
 
 This tab explains the pitch-classes structure of the song "Weightless" from playlist 3, humans science as well from the song "Totally Beached", an archetypical song in the playlist 4, dogs science-based.
 
-**WEIGHTLESS** 
+**WEIGHTLESS**
 
 I selected the song "Weightless" by Marconi Union from group 3 (humans, science-based) upon [this research](https://www.britishacademyofsoundtherapy.com/wp-content/uploads/2019/10/Mindlab-Report-Weightless-Radox-Spa.pdf) into relaxing capabilities of music to lower anxiety in humans (e.g. pre-surgery). This study concluded upon a top 10 list of most relaxing songs, with Weightless as nr 1.
 
@@ -390,10 +489,11 @@ Weightless is -intendedly- not a very energetic or (pitch/chords/beats/timbre) c
 
 (possibly: more explanation to follow)
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/6kkwzB6hXLIONkEk9JciA6?utm_source=generator" width="100%" height="85" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1"> allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/6kkwzB6hXLIONkEk9JciA6?utm_source=generator" width="100%" height="85" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1">
 
+allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"\>
 
-
+</iframe>
 
 **TOTALLY BEACHED**
 
@@ -401,10 +501,9 @@ I selected the song "Totally beached" from the fourth group (dogs, science-based
 
 Totally Beached is a relative short song, where in the chromagram I believe to see a clear reggae-style appearance of offbeat chord elements. The song follows a classic reggae chord development between I and IV (in this case G minor and C minor). What surprises me in the chrogram is a relative small prominence of Eb, the terts in C minor. The last 10 seconds are a fading-out stall of the applied instruments, hanging on to a single C-dominated finale.
 
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0SLtSDSjPupBUmrXtUNgPE?utm_source=generator" allowfullscreen width="100%" height="85" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/0SLtSDSjPupBUmrXtUNgPE?utm_source=generator"  allowfullscreen="" width="100%" height="85" frameBorder="0" allowtransparency="true" allow="encrypted-media" data-external="1" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe> 
-
- 
+</iframe>
 
 ------------------------------------------------------------------------
 
@@ -493,15 +592,15 @@ grid.arrange(cepstrh, cepstrod, ncol = 1)
 
 On the left here are 2 cepstrograms, aimed at providing insights into the different timbre aspects of pieces of music.
 
-The cepstrogram on 'Weightless', the song elected as most relaxing for humans shows an enormous amount of c02 timbre elements, meaning a high level of brightness. (more analysis to follow)
+The cepstrogram on **'Weightless'**, the song elected as most relaxing for humans, shows an enormous amount of c02 timbre elements, meaning a high level of brightness 'at the expense' of other timbre aspects. The first 16 seconds/beats of the song a spread (in green) between C2 and C03 occurs and this relates to the fade-in of the synths elements that reach peak from that moment and -thus- further concentrates in C02. 4.52 minutes into the song another high-pitched element is introduced and from that moment on some more "C02-interrupting" musical elements (mostly high-pitched sounds) are put into the mix of the audio. This can be in the occasional interruption of bright yellow in C02 after 500 seconds in conjunction with green in other timbre aspects.
 
-For the second cepstrogram: first indications make me think that flatness is indeed high in Totally Beached (an archetype song from the dogs science based playlist). Also a relative high level of c04 which could relate to the relative sharp 'attack' style of the strumming guitar with reggae. (more analysis to follow)
+For the second cepstrogram: first indications make me think that flatness is indeed high in **'Totally Beached'**. Also a relative high level of c04 which relates to the relative sharp 'attack' style of the strumming guitar with reggae. Between seconds 85 and 95 bass guitar and percussion are gone (less C03), then bass guitar comes back (more C02) and then percussion also comes back from second 116 and everything is back to 'normal'. The 2 dark yellow marks for Co3 at 130 seconds and 143 seconds relate to a short cymbal sound at these moments.
+
+Both songs, especially Weightless, score relatively low on C01 (which correlates to loudness) in these cepstrograms and this is in line with the individual loudness variable measurements by the Spotify API (-19.974 for Weightless and -18.861 for Totally Beached).
 
 ------------------------------------------------------------------------
 
 ### Self-Similarity Matrices
-
-
 
 ```{r for SSM dogsscience, echo=FALSE, message=FALSE}
 library(tidyverse)
@@ -552,7 +651,6 @@ bind_rows(
   labs(x = "", y = "")
 ```
 
-
 ```{r for SSM humans outlier dance, echo=FALSE, message=FALSE}
 library(tidyverse)
 library(spotifyr)
@@ -601,8 +699,6 @@ bind_rows(
   theme_classic() +
   labs(x = "", title = "Disturbia - Lenji", y = "")
 ```
-
-
 
 ```{r for SSM humans We can Fly, echo=FALSE, message=FALSE}
 library(tidyverse)
@@ -653,10 +749,6 @@ bind_rows(
   labs(x = "", title = "We Can Fly - Rue du Soleil", y = "")
 ```
 
-
-
-
-
 ------------------------------------------------------------------------
 
 Explanation to follow; for Weightless: the song is intendedly designed to lower the BPM
@@ -664,9 +756,6 @@ Explanation to follow; for Weightless: the song is intendedly designed to lower 
 ------------------------------------------------------------------------
 
 ### Homework for week 10, keys analysis
-
-
-
 
 Homework week 10 continued (part 3): chordogram on keys {data-commentary-width="500"}
 
@@ -878,171 +967,22 @@ LOUDNESS COMPARISON: well, at least produced a graph....now for some analysis...
 
 DRAFT, bulletpoint like remarks:
 
-- referring to Pien Zwart's BA afstudeeropdracht (?)
+-   referring to Pien Zwart's BA afstudeeropdracht (?)
 
--   dogs playlist more strictly based on criteria for 'true' relaxation (e.g. tempo around 60-80; low energy); the definition for humans relaxation seems, even for the science-based list, more loosely formulated
+-   dogs playlist more strictly based on criteria for 'true' relaxation (e.g. tempo around 60-80; low energy); the definition for humans relaxation seems, even for the science-based list, more loosely formulated. The relaxation for dogs musical elements cater for the **'real'** form of relaxtion that I searched for (i.e. getting the listener into a state of calm, near-sleep)
+
+-   My construction of the playlists has been based on diverse definitions/criteria regarding the words 'relax(ation)' and/or 'calming'
 
 -   I don't see the aspect of variation in the playlist dogs, science-based whereas this is mentioned in research as an important aspect for the desired effect (calming of dogs)
 
 -   the Spotify API doesn't fully work flawlessly, some musical elements are clearly wrongly analysed and put incorrectly in a data figure. Which means: listen often to the songs!
 
-- also statements/claims in literature need to be critically assessed and evaluated. Most 
+-   also statements/claims in literature need to be critically assessed and evaluated. Most
 
 -   the playlist humans science is based on a scientifically selected set of 10 most relaxing songs (with the aim of anxiety relief, e.g. pre-surgery). Yet, I find this list in terms of musical aspects like e.g. tempo, energy and speechiness not very well suited for true relaxation; I believe the definition of 'relaxation' for this group, as well as for the general playlist humans is less strict than the definition for the 2 playlists for dogs. The latter 2 are more strictly designed to calm (in terms of heartrate, blood pressure, etc.)
 
 -   the bioacoustic aspects that research (partly leading to my 4th group dogs scientific) into calming effects of sounds to dogs have not been analysed. Spotify doesn't provide Nor does Spotify generate music above (but IN for dogs) the hearing frequency spectrum for humans
 
--   the aspect of variations in music for dogs, to counter boredom, as described in [this research] as an important factor
+-   the aspect of variations in music for dogs, to counter boredom, as described in [this research] as an important factor, I define as a widely scattered set of outcomes of musical variables (e.g. ....) and this isn't the case for the 2 playlists for dogs. The aspects of prediction (based upon expectations) for music, meaning repetition of certain styles, genres etc. I don't think applies to dogs (their brains aren;t that developed)
 
 ------------------------------------------------------------------------
-
-
-### Classification and clustering 
-
-
-```{r}
-library(compmus)
-
-get_conf_mat <- function(fit) {
-  outcome <- .get_tune_outcome_names(fit)
-  fit |> 
-    collect_predictions() |> 
-    conf_mat(truth = outcome, estimate = .pred_class)
-}  
-
-get_pr <- function(fit) {
-  fit |> 
-    conf_mat_resampled() |> 
-    group_by(Prediction) |> mutate(precision = Freq / sum(Freq)) |> 
-    group_by(Truth) |> mutate(recall = Freq / sum(Freq)) |> 
-    ungroup() |> filter(Prediction == Truth) |> 
-    select(class = Prediction, precision, recall)
-} 
-```
-
-```{r}
-halloween <-
-  get_playlist_audio_features("bnfcollection", "1vsoLSK3ArkpaIHmUaF02C") |>
-  add_audio_analysis() |>
-  mutate(
-    segments = map2(segments, key, compmus_c_transpose),
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "mean", norm = "manhattan"
-      ),
-    timbre =
-      map(
-        segments,
-        compmus_summarise, timbre,
-        method = "mean"
-      )
-  ) |>
-  mutate(pitches = map(pitches, compmus_normalise, "clr")) |>
-  mutate_at(vars(pitches, timbre), map, bind_rows) |>
-  unnest(cols = c(pitches, timbre))
-```
-
-```{r}
-halloween_juice <-
-  recipe(
-    track.name ~
-      danceability +
-      energy +
-      loudness +
-      speechiness +
-      acousticness +
-      instrumentalness +
-      liveness +
-      valence +
-      tempo +
-      duration +
-      C + `C#|Db` + D + `D#|Eb` +
-      E + `F` + `F#|Gb` + G +
-      `G#|Ab` + A + `A#|Bb` + B +
-      c01 + c02 + c03 + c04 + c05 + c06 +
-      c07 + c08 + c09 + c10 + c11 + c12,
-    data = halloween
-  ) |>
-  step_center(all_predictors()) |>
-  step_scale(all_predictors()) |> 
-  # step_range(all_predictors()) |> 
-  prep(halloween |> mutate(track.name = str_trunc(track.name, 20))) |>
-  juice() |>
-  column_to_rownames("track.name")
-```
-
-```{r}
-halloween_dist <- dist(halloween_juice, method = "euclidean")
-```
-
-```{r}
-halloween_dist |> 
-  hclust(method = "average") |> # Try single, average, and complete.
-  dendro_data() |>
-  ggdendrogram()
-```
-
-
-```{r}
-clusteringdogsscience <-
-  get_playlist_audio_features("bnfcollection", "7fDYYm1v0QKoyj7c8rbCul") |>
-  add_audio_analysis() |>
-  mutate(
-    segments = map2(segments, key, compmus_c_transpose),
-    pitches =
-      map(segments,
-        compmus_summarise, pitches,
-        method = "mean", norm = "manhattan"
-      ),
-    timbre =
-      map(
-        segments,
-        compmus_summarise, timbre,
-        method = "mean"
-      )
-  ) |>
-  mutate(pitches = map(pitches, compmus_normalise, "clr")) |>
-  mutate_at(vars(pitches, timbre), map, bind_rows) |>
-  unnest(cols = c(pitches, timbre))
-```
-
-```{r}
-clusteringdogsscience_juice <-
-  recipe(
-    track.name ~
-      danceability +
-      energy +
-      loudness +
-      speechiness +
-      acousticness +
-      instrumentalness +
-      liveness +
-      valence +
-      tempo +
-      duration +
-      C + `C#|Db` + D + `D#|Eb` +
-      E + `F` + `F#|Gb` + G +
-      `G#|Ab` + A + `A#|Bb` + B +
-      c01 + c02 + c03 + c04 + c05 + c06 +
-      c07 + c08 + c09 + c10 + c11 + c12,
-    data = clusteringdogsscience
-  ) |>
-  step_center(all_predictors()) |>
-  step_scale(all_predictors()) |> 
-  # step_range(all_predictors()) |> 
-  prep(clusteringdogsscience |> mutate(track.name = str_trunc(track.name, 5000))) |>
-  juice() |>
-  column_to_rownames("track.name")
-```
-
-```{r}
-clusteringdogs_dist <- dist(clusteringdogsscience_juice, method = "euclidean")
-```
-
-```{r}
-clusteringdogs_dist |> 
-  hclust(method = "average") |> # Try single, average, and complete.
-  dendro_data() |>
-  ggdendrogram()
-```
