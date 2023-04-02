@@ -248,27 +248,30 @@ I based my fourth group, called on Spotify "Through a Dogs Ear, science-based su
 
 Spotify playlist humans:
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3B0FtfxNiFOo82o8lmJcIp?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
-
-</iframe>
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/3B0FtfxNiFOo82o8lmJcIp?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
 
 <https://open.spotify.com/playlist/3B0FtfxNiFOo82o8lmJcIp?si=d6447cd190234b6a>
 
 Spotify playlist dogs:
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5hQo2asoxqQrnJFeufycj1?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/5hQo2asoxqQrnJFeufycj1?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
 
 <https://open.spotify.com/playlist/5hQo2asoxqQrnJFeufycj1?si=565ef05c6ff24ae0>
 
 Spotify playlist humans scientific:
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1t06IDDtn5eYo4Ow7Fwmcb?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/1t06IDDtn5eYo4Ow7Fwmcb?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
+
+</iframe>
+
 
 <https://open.spotify.com/playlist/1t06IDDtn5eYo4Ow7Fwmcb?si=5d4a68e5d2334b34>
 
 Spotify playlist dogs scientific:
 
-<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0km3mDUsP3LYDS1BZfqsY5?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/0km3mDUsP3LYDS1BZfqsY5?utm_source=generator" width="100%" height="352" frameBorder="0" allowfullscreen allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy">
+
+</iframe>
 
 
 <https://open.spotify.com/playlist/0km3mDUsP3LYDS1BZfqsY5?si=2775cd3b8a18422d)>
@@ -392,7 +395,7 @@ For this playlist 4 I chose the song [Totally Beached by Joshua Leeds](https://o
 
 ------------------------------------------------------------------------
 
-### Analysis of 2 **'archetype'** songs in terms of chroma features (providing pitch class insights) as can be seen in chromagrams {data-commentary-width="450"}
+### Analysis of 2 **'archetype'** songs in terms of chroma features (providing pitch class insights) as can be seen in chromagrams {data-commentary-width="500"}
 
 ```{r, selection of several songs for bla chroma analysis}
 
@@ -473,7 +476,7 @@ Totally Beached is a relative short song, where in the chromagram I believe to s
 
 ------------------------------------------------------------------------
 
-### Some timbre analysis with the help of cepstrograms {data-commentary-width="550"}
+### Some timbre analysis with the help of cepstrograms {data-commentary-width="450"}
 
 ```{r, cepstrogram for bla Weightless Union}
 
@@ -756,7 +759,11 @@ strawberryswing2 |>
 
 ------------------------------------------------------------------------
 
-As most songs from all 4 playlists are -intendedly- not very 'exciting' in terms of a lot of musical elements (and their possible changes during a song) like tempo, energy, instrumentalness, etc. I decided to pick an outlier from playlist 3 (humansscience) which scores highest on tempo and relatively high on energy: Strawberry Swing by Coldplay, to see what happens chords-wise. A chordagram is presented here.
+As most songs from all 4 playlists are -intendedly- not very 'exciting' in terms of a lot of musical elements (and their possible changes during a song) like tempo, energy, instrumentalness, etc. I decided to pick an outlier from playlist 3 (humansscience) which scores highest on tempo and relatively high on energy: Strawberry Swing by Coldplay, to see what happens chords-wise. A key- and chordagram are presented here.
+
+https://open.spotify.com/track/2dphvmoLEXdk8hOYxmHlI3?si=0add982162e04af4
+
+As expected, an emphasis on I, IV and V prominence for a song in Ab. Interesting:a lot of dark blue in C# (enharmonically the same as Db). With knowledge of Western chords and their relationships (tonica, subdominant, dominant and others) I expected that the software would 'know' - in the context of this piece of music; circle of fifths!- that Db strongly 'belongs' to Ab (and C# not really).
 
 The song is in Ab (as tonica I) with mostly changes to IV (Db) and V (Eb). This is a rather 'normal' chords progression. The black spot around 95 seconds in Db appears to me the emphasis/power on Db (as 'tension' dominant to Ab) just before 'releasing' to tonica Ab ('home'/stability). The same 'returned home' energy on Ab can been seen in the last 80 seconds of the song. As G# enharmonically is the same as Ab, it is no surprise that there's relative a lot of energy in there too. There's also a prominance to be seen in seventh chords, a usual patterns in chordagrams as explained by our lector: 'leakage' of energy in the 7th 'bin' (close to the 1st tonica) plays a role here sometimes).
 
@@ -803,7 +810,7 @@ combine2lists |>
   labs(x = "Spotify Timbre Coefficients", y = "", fill = "Genre")
 ```
 
-Homework week 10 continued (part 4): timbre comparison between 2 playlists (dogs and dogs science) {data-commentary-width="500"}
+### Timbre comparison between 2 playlists (dogs and dogs science) {data-commentary-width="500"}
 
 ```{r, week 10 extra}
 
@@ -844,56 +851,13 @@ combine3lists |>
   labs(x = "Spotify Timbre Coefficients", y = "", fill = "Genre")
 ```
 
-###  continued: loudness comparison between 2 playlists (dogs and dogs science) {data-commentary-width="500"}
+***
 
-```{r, week 10 extra bla}
-combine3lists |>
-  mutate(
-    sections =
-      map(
-        sections,                                    # sections or segments
-        summarise_at,
-        vars(tempo, loudness, duration),             # features of interest
-        list(section_mean = mean, section_sd = sd)   # aggregation functions
-      )
-  ) |>
-  unnest(sections) |>
-  ggplot(
-    aes(
-      x = tempo,
-      y = tempo_section_sd,
-      colour = genre,
-      alpha = loudness
-    )
-  ) +
-  geom_point(aes(size = duration / 60)) +
-  geom_rug() +
-  theme_minimal() +
-  ylim(0, 5) +
-  labs(
-    x = "Mean Tempo (bpm)",
-    y = "SD Tempo",
-    colour = "Genre",
-    size = "Duration (min)",
-    alpha = "Volume (dBFS)"
-  )
-```
-
-------------------------------------------------------------------------
+I see no major differences in the lower (C01-c06) timbre coefficients except slightly for 04 and 06. Also perhaps  categories c06-c10 produce somewhat higher scores for Dogs Science. This graph doesn't show any real significant differences imo (whereas on acousticness, see tab "A first analysis") the dogs lists are significantly different imo. Apperently this has no influence on these timbre coefficients.
 
 
+***
 
-As expected, an emphasis on I, IV and V prominence for a song in Ab. Interesting:a lot of dark blue in C# (enharmonically the same as Db). With knowledge of Western chords and their relationships (tonica, subdominant, dominant and others) I expected that the software would 'know' - in the context of this piece of music; circle of fifths!- that Db strongly 'belongs' to Ab and C# not really.
-
-ON CEPSTOGRAMS:
-
-At first sight, no c02 or c03 scores for the humans science groups, that's...remarkable. A handicap of this comparison is that the playlist human science only contains 10 songs. But still, the absence of c02 and c03 is remarkable. In the next tab I will analyse two larger groups, dogs and dogs science.
-
-No major differences are to be seen here between these 2 groups in terms of Timbres except perhaps that categories c06-c10 produces higher scores for Dogs Science.
-
-LOUDNESS COMPARISON: well, at least produced a graph....now for some analysis...:)
-
-------------------------------------------------------------------------
 
 ### Tempo analysis; a simple boxplot on tempo for my 4 playlists
 
@@ -994,7 +958,7 @@ In addition: I found out (from my own research, i.e. listening to the song on Sp
 
 Irrespective of this, the song is **intendedly** designed to start at a certain BPM and then -after some 5 minutes- slows down towards a lower BPM figure. Reason: assisting in bringing the heart rate of the listener down. Yet, hardly -if at all- to be seen in the tempograms: not the 60 BPM start nor the descend to around 52-54 BPM. The problem relates to the fact that the song **does** have a (low on loudness but definitely consciously hearable) 4/4 meter-type beat but the chords elements are largely ambient-like synths without clear onsets. There **are** melodical elements but they play a minor role and don't necessarily occur in a structured/repetitive manner on anyone of the 4/4 meter beats.
 
-So, I allowed myself a sidestep towards another tool, namely Sonic Visualizer wherein (see blue-pink graph below) the waveform of Weightless is shown together with a green line that shows the result from a transform function (add-on to Sonic Profiler) for tempo and beats. The vertical black line, at 6.02 minutes into the song marks the beginning of the descent of the measured BPM's. Please note: you see here a so-called 'tempo-octave': the green line averages until minute 6.02 around 122 BPM which can be interpreted as double the 'real' (at least perceived by me!)
+So, I allowed myself a sidestep towards another tool, namely Sonic Visualizer wherein (see blue-pink graph below) the waveform of Weightless is shown together with a green line that shows the result from a transform function (add-on to Sonic Profiler) for tempo and beats. The vertical black line, at 6.02 minutes into the song marks the beginning of the descent of the measured BPM's. Please note: you see here a so-called 'tempo-octave': the **green** line (please look very closely!!) averages until minute 6.02 around 122 BPM which can be interpreted as double the 'real' (at least perceived by me!) and then this green line descents.
 
 ![](images/sonic.png){width="14cm"}
 
