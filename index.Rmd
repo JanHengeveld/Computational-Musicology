@@ -701,16 +701,16 @@ A slow-paced song, ambient, no percussion, focus on chords and simple melody. Th
 
 ### A brief keys analysis {data-commentary-width="500"}
 
+
 ![](images/keygram.png){width="20cm", height="30cm"}
 
 
-***
-
+  
+*** 
+  
 A simple key spread analysis over the 4 playlists. As expected by me, C, F and G stand out (for the 2 dogs lists) but not for regular humans list, where -besides F- also C# is used often together with A and B.
 
 ***
-
-
 
 ### Chordograms {data-commentary-width="500"}
 
